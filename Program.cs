@@ -1,4 +1,4 @@
-﻿class Sod
+class Sod
 {
     static void plot_solution(double[] xc, double[,] v_cons, double time, int N, double GAMMA)
     {
@@ -132,18 +132,22 @@
        v_cons[M] - вектор консервативных переменных (in)
        boun_v[M] - вектор консервативных переменных, необходимый для реализации граничного условия (out)
        boun_type - тип граничного условия (in) */
-    static double[] boundary(double[] v_cons)
+    static double[] boundary(double[] v_cons, int wall)
     {
         double[] boun_v = new double[3];
-
+        if (wall == 0) { 
+        
         boun_v[0] = v_cons[0];
         boun_v[1] = -v_cons[1];
         boun_v[2] = v_cons[2];
-        /*
-                boun_v[0] = v_cons[0];
-                boun_v[1] = v_cons[1];
-                boun_v[2] = v_cons[2];
-        */
+        }
+        if (wall == 1)
+        {
+
+            boun_v[0] = v_cons[0];
+            boun_v[1] = v_cons[1];
+            boun_v[2] = v_cons[2];
+        }
         return boun_v;
     }
 
@@ -344,18 +348,18 @@
 
         double GAMMA = 1.4;         /* показатель адиабаты */
         int CELLS_LEFT = 100;         /* количество ячеек слева от первоначального разрыва */
-        double T_END = 0.4;         /* время расчета */
+        double T_END = 0.05;         /* время расчета */
         /* неконсервативные параметры слева от разрыва */
 
         double LEFT_R = 1.0;
-        double LEFT_U = 0.0;
+        double LEFT_U = -1.0;
         double LEFT_P = 1.0;
 
         /* неконсервативные параметры справа от разрыва */
 
-        double RIGHT_R = 0.125;
-        double RIGHT_U = 0.0;
-        double RIGHT_P = 0.1;
+        double RIGHT_R = 1;
+        double RIGHT_U = 1.0;
+        double RIGHT_P = 1;
 
         double[] x = new double[N + 1];                                  /* массив координат узлов сетки */
         double[] xc = new double[N];                                   /* массив координат центров ячеек сетки */
@@ -436,7 +440,7 @@
                         temp[j] = u_prev[0, j];
                     }
                     /* обработка граничного условия */
-                    boun_v = boundary(temp);
+                    boun_v = boundary(temp,0);
                     flux_left = calc_flux(boun_v, temp, GAMMA);
                 }
 
@@ -461,7 +465,7 @@
                         temp[j] = u_prev[N - 1, j];
                     }
                     /* обработка граничного условия */
-                    boun_v = boundary(temp);
+                    boun_v = boundary(temp,0);
                     flux_right = calc_flux(temp, boun_v, GAMMA);
                 }
 

@@ -1,11 +1,43 @@
+using CsvHelper;
+using CsvHelper.Configuration.Attributes;
+using System.Globalization;
+
 class Sod
 {
-    static void plot_solution(double[] xc, double[,] v_cons, double time, int N, double GAMMA)
+    static void writeCSV_solution(double[] xc, double[,] v_cons, double time, int N, double GAMMA,string name)
     {
+        StreamWriter f = new StreamWriter(name + Math.Round(time * 1000) +"ms"+ ".csv");
+        CsvWriter csv = new CsvWriter(f,CultureInfo.InvariantCulture);
 
-        //Chart chart = new Chart();
+        csv.WriteField("X");
+        csv.WriteField("density");
+        csv.WriteField("speed");
+        csv.WriteField("pressure");
+        csv.WriteField("energy");
+        csv.NextRecord();   
+        double[] v_ncons = new double[3];
+        int i, j;
+        for (i = 0; i < N; i++)
+        {
+            csv.WriteField(xc[i]);
+            double[] t = new double[3];
+            for (j = 0; j < 3; j++)
+                t[j] = v_cons[i, j];
+            v_ncons = convert_cons_to_noncons(t, GAMMA);
+            for (j = 0; j < 3; j++)
+            {
+                csv.WriteField(v_ncons[j]);
+                f.Write(" ");
+            }
+            var te = v_ncons[2] / v_ncons[0] / (GAMMA - 1.0);
+            csv.WriteField(te);
 
+            csv.Configuration.Delimiter.Replace(',', ';');
+            csv.NextRecord();
+        }
+        f.Close();
     }
+
 
     static void write_solution(double[] xc, double[,] v_cons, double time, int N, double GAMMA)
     {
@@ -33,15 +65,13 @@ class Sod
         f.Close();
     }
 
-
     static double calc_time_step(double[] x, double[,] v_cons, int time_step_number, int N, double GAMMA)
     {
-
         int i;
-        double new_step = 1e10;   /* рассчитываемый новый шаг по времени */
-        double[] v_ncons = new double[3];              /* вектор примитивных переменных в текущей ячейке */
-        double c;                       /* скорость звука в текущей ячейке */
-        double curr_step;               /* новый шаг по времени, рассчитанный по параметрам в текущей ячейке */
+        double new_step = 1e10;   
+        double[] v_ncons = new double[3];               
+        double c;                       
+        double curr_step;               
 
         for (i = 0; i < N; i++)
         {
@@ -67,7 +97,6 @@ class Sod
 
     }
 
-
     static double[] convert_noncons_to_cons(double[] v_ncons, double GAMMA)
     {
         double[] res = new double[3];
@@ -88,20 +117,14 @@ class Sod
 
     static double calc_sound_velocity(double[] v_ncons, double GAMMA)
     {
-
         return (Math.Sqrt(GAMMA * v_ncons[2] / v_ncons[0]));
-
     }
 
-
-    /* Расчет вектора дифференциального потока по вектору консервативных переменных
-       v_cons[M] - вектор консервативных переменных (in)
-       flux[M] - рассчитываемый вектор дифференциального потока (out) */
     static double[] diff_flux_cons(double[] v_cons, double GAMMA)
     {
         int M = 3;
         double[] flux = new double[M];
-        double[] v_ncons = new double[M];                                      /* вектор примитивных переменных */
+        double[] v_ncons = new double[M];                                      
 
         v_ncons = convert_cons_to_noncons(v_cons, GAMMA);
 
@@ -110,40 +133,18 @@ class Sod
         flux[2] = (v_cons[2] + v_ncons[2]) * v_ncons[1];      /* полная энергия */
         return flux;
     }
-
-    /* Расчет вектора дифференциального потока по вектору примитивных переменных
-       v_ncons[M] - вектор примитивных переменных (in)
-       flux[M] - рассчитываемый вектор дифференциального потока (out) */
-    static double[] diff_flux_ncons(double[] v_ncons, double GAMMA)
-    {
-        int M = 3;
-        double[] flux = new double[M];
-        double[] v_cons = new double[M];                                       /* вектор консервативных переменных */
-
-        v_cons = convert_noncons_to_cons(v_ncons, GAMMA);
-
-        flux[0] = v_cons[1];                                    /* масса */
-        flux[1] = v_cons[1] * v_ncons[1] + v_ncons[2];          /* импульс */
-        flux[2] = (v_cons[2] + v_ncons[2]) * v_ncons[1];      /* полная энергия */
-        return flux;
-    }
-
-    /* Обработка граничного условия
-       v_cons[M] - вектор консервативных переменных (in)
-       boun_v[M] - вектор консервативных переменных, необходимый для реализации граничного условия (out)
-       boun_type - тип граничного условия (in) */
+     
     static double[] boundary(double[] v_cons, int wall)
     {
         double[] boun_v = new double[3];
-        if (wall == 0) { 
-        
-        boun_v[0] = v_cons[0];
-        boun_v[1] = -v_cons[1];
-        boun_v[2] = v_cons[2];
+        if (wall == 0) 
+        { 
+            boun_v[0] = v_cons[0];
+            boun_v[1] = -v_cons[1];
+            boun_v[2] = v_cons[2];
         }
         if (wall == 1)
         {
-
             boun_v[0] = v_cons[0];
             boun_v[1] = v_cons[1];
             boun_v[2] = v_cons[2];
@@ -151,39 +152,6 @@ class Sod
         return boun_v;
     }
 
-
-    /* Расчет матрицы Якоби одномерной системы уравнений газовой динамики
-       v_cons[M] - вектор консервативных переменных (in)
-       jacob[M,M] - матрица Якоби одномерной системы уравнений газовой динамики (out) */
-    static double[,] calc_jacob(double[] v_cons, double GAMMA)
-    {
-        double[,] jacob = new double[3, 3];
-        double[] v_ncons = new double[3];
-        double teta, b, h;
-
-        v_ncons = convert_cons_to_noncons(v_cons, GAMMA);
-
-        teta = 0.5 * v_ncons[1] * v_ncons[1];
-        b = GAMMA - 1.0;
-        h = 0.5 * v_ncons[1] * v_ncons[1] + GAMMA * v_ncons[2] / v_ncons[0] / (GAMMA - 1.0);
-
-        jacob[0, 0] = 0.0;
-        jacob[0, 1] = 1.0;
-        jacob[0, 2] = 0.0;
-
-        jacob[1, 0] = -v_ncons[1] * v_ncons[1] + teta * b;
-        jacob[1, 1] = v_ncons[1] * (2.0 - b);
-        jacob[1, 2] = b;
-
-        jacob[2, 0] = v_ncons[1] * (teta * b - h);
-        jacob[2, 1] = h - v_ncons[1] * v_ncons[1] * b;
-        jacob[2, 2] = v_ncons[1] * (1.0 + b);
-        return jacob;
-    }
-
-    /* Расчет матрицы из собственных векторов одномерной системы уравнений газовой динамики
-       v_cons[M] - вектор консервативных переменных (in)
-       omega[M,M] - матрица из собственных векторов одномерной системы уравнений газовой динамики (out) */
     static double[,] calc_omega(double[] v_cons, double GAMMA)
     {
         int M = 3;
@@ -214,10 +182,7 @@ class Sod
 
         return omega;
     }
-
-    /* Расчет обратной матрицы из собственных векторов одномерной системы уравнений газовой динамики
-       v_cons[M] - вектор консервативных переменных (in)
-       omega_inverse[M,M] - матрица, обратная матрице из собственных векторов одномерной системы уравнений газовой динамики (out) */
+     
     static double[,] calc_omega_inverse(double[] v_cons, double GAMMA)
     {
         int M = 3;
@@ -248,19 +213,13 @@ class Sod
         return omega_inverse;
     }
 
-    /* Расчет диагональной матрицы с модулями собственных чисел одномерной системы уравнений газовой динамики на диагонали
-       v_cons[M] - вектор консервативных переменных (in)
-       lambda[M,M] - диагональная матрица с модулями собственных чисел одномерной системы уравнений газовой динамики на диагонали */
     static double[,] calc_lambda(double[] v_cons, double GAMMA)
     {
         int M = 3;
         double[,] lambda = new double[M, M];
         double[] v_ncons = new double[M];
-        double c;               /* скорость звука */
-
-
+        double c;              
         v_ncons = convert_cons_to_noncons(v_cons, GAMMA);
-
         c = calc_sound_velocity(v_ncons, GAMMA);
 
         lambda[0, 0] = Math.Abs(v_ncons[1] - c);
@@ -282,18 +241,13 @@ class Sod
         int M = 3;
         int i, j;
         double[] flux = new double[M];
-        /* результат перемножения всех матриц для параметров слева и справа от разрыва */
         double[,] m_left = new double[M, M];
         double[,] m_right = new double[M, M];
 
-        /* вектора дифференциальных потоков для параметров слева и справа от разрыва */
         var left_diff_flux = diff_flux_cons(left_params, GAMMA);
         var right_diff_flux = diff_flux_cons(right_params, GAMMA);
 
-        /* определение матрицы в функции потока для параметров слева от разрыва */
         m_left = cir_util(left_params, GAMMA);
-
-        /* определение матрицы в функции потока для параметров справа от разрыва */
         m_right = cir_util(right_params, GAMMA);
 
         for (i = 0; i < M; i++)
@@ -307,16 +261,10 @@ class Sod
 
     static double[,] cir_util(double[] cons_params, double GAMMA)
     {
-        /* матрица из собственных векторов системы уравнений газовой динамики */
         var omega = calc_omega(cons_params, GAMMA);
-
-        /* обратная к матрице из собственных векторов системы уравнений газовой динамики */
         var omega_inverse = calc_omega_inverse(cons_params, GAMMA);
-
-        /* диагональная матрица с модулями собственных чисел системы уравнений газовой динамики */
         var lambda = calc_lambda(cons_params, GAMMA);
-
-        /* результат перемножения матриц омега и лямбда */
+        
         var m_tmp = mult_matrixes(omega, lambda);
         return mult_matrixes(m_tmp, omega_inverse);
     }
@@ -342,58 +290,49 @@ class Sod
 
     static void Main()
     {
-        int N = 200;             /* число отрезков разбиения единичного отрезка */
+
+        string result_name_file = "sod_t1000_";
+        double GAMMA = 1.4;       
+        double T_END = 0.01 ;        
+
+        double LEFT_R = 1;
+        double LEFT_U = 0;
+        double LEFT_P = 1;
+
+        double RIGHT_R = 0.1;
+        double RIGHT_U = 0;
+        double RIGHT_P = 0.1;
+        int N = 1000;           
         int M = 3;
-        /* "тест Сода" */
 
-        double GAMMA = 1.4;         /* показатель адиабаты */
-        int CELLS_LEFT = 100;         /* количество ячеек слева от первоначального разрыва */
-        double T_END = 0.05;         /* время расчета */
-        /* неконсервативные параметры слева от разрыва */
-
-        double LEFT_R = 1.0;
-        double LEFT_U = -1.0;
-        double LEFT_P = 1.0;
-
-        /* неконсервативные параметры справа от разрыва */
-
-        double RIGHT_R = 1;
-        double RIGHT_U = 1.0;
-        double RIGHT_P = 1;
-
-        double[] x = new double[N + 1];                                  /* массив координат узлов сетки */
-        double[] xc = new double[N];                                   /* массив координат центров ячеек сетки */
-        double[,] u_prev = new double[N, M];                            /* вектора консервативных переменных на n-ом слое */
-        double[,] u_next = new double[N, M];                            /* вектора консервативных переменных на (n+1)-ом слое */
-        double[] boun_v = new double[M];                               /* вектор консервативных переменных для реализации граничного условия */
+        double[] x = new double[N + 1];                              
+        double[] xc = new double[N];                                  
+        double[,] u_prev = new double[N, M];              
+        double[,] u_next = new double[N, M];              
+        double[] boun_v = new double[M];               
         double[] flux_left = new double[M];
-        double[] flux_right = new double[M];             /* потоки через грани расчетной ячейки */
-        double dt = 1e-6;                                       /* шаг по времени */
-        int steps_num = 0;                              /* счетчик числа шагов */
-        double curr_t = 0.0;                            /* текущее время */
+        double[] flux_right = new double[M];             
+        double dt = 1e-6;                                        
+        int steps_num = 0;                               
+        double curr_t = 0.0;                         
+        double h = 1.0 / N;  
 
-        /* определение координат узлов сетки */
-        double h = 1.0 / N;   /* шаг расчетной сетки *//* равномерное распределение узлов сетки */
-
-        /* координаты узлов */
         for (int i = 0; i < N + 1; i++)
         {
             x[i] = i * h;
         }
 
-        /* координаты центров ячеек */
         for (int i = 0; i < N; i++)
         {
             xc[i] = 0.5 * (x[i] + x[i + 1]);
         }
 
-        /* инициализация вектора-решения */
 
         double[] v = new double[M];
 
         for (int i = 0; i < N; i++)
         {
-            if (i < CELLS_LEFT)
+            if (i < Math.Round(N*0.5))
             {
                 v[0] = LEFT_R;
                 v[1] = LEFT_U;
@@ -411,16 +350,13 @@ class Sod
                 u_prev[i, j] = temp[j];
             }
         }
-        write_solution(xc, u_prev, curr_t, N, GAMMA);
-        /* основной цикл по времени */
+        writeCSV_solution(xc, u_prev, curr_t, N, GAMMA,result_name_file);
         while (T_END - curr_t > 0)
         {
 
             dt = calc_time_step(x, u_prev, steps_num, N, GAMMA);
-            /* цикл по ячейкам */
             for (int i = 0; i < N; i++)
             {
-                /* расчет потока через левую грань ячейки */
                 if (i != 0)
                 {
                     double[] temp1 = new double[M];
@@ -439,12 +375,10 @@ class Sod
                     {
                         temp[j] = u_prev[0, j];
                     }
-                    /* обработка граничного условия */
-                    boun_v = boundary(temp,0);
+                    boun_v = boundary(temp,1);
                     flux_left = calc_flux(boun_v, temp, GAMMA);
                 }
 
-                /* расчет потока через правую грань ячейки */
                 if (i != N - 1)
                 {
                     double[] temp1 = new double[M];
@@ -464,12 +398,10 @@ class Sod
                     {
                         temp[j] = u_prev[N - 1, j];
                     }
-                    /* обработка граничного условия */
-                    boun_v = boundary(temp,0);
+                    boun_v = boundary(temp,1);
                     flux_right = calc_flux(temp, boun_v, GAMMA);
                 }
 
-                /* цикл по компонентам вектора */
                 for (int j = 0; j < M; j++)
                     u_next[i, j] = u_prev[i, j] - dt * (flux_right[j] - flux_left[j]) / (x[i + 1] - x[i]);
             }
@@ -481,17 +413,16 @@ class Sod
             curr_t += dt;
             steps_num += 1;
 
-            if (Math.Round(curr_t % 0.01, 4) == 0)
+            if (Math.Round(curr_t % 0.2, 3) == 0)
             {
-                write_solution(xc, u_prev, curr_t, N, GAMMA);
-                Console.WriteLine(steps_num);
+                
+                writeCSV_solution(xc, u_prev, curr_t, N, GAMMA, result_name_file);
+                Console.WriteLine("stpep num: "+steps_num+" time: "+curr_t);
             }
 
         }
 
-        Console.WriteLine(steps_num);
-
-        /* запись результатов на нужный момент времени */
+        Console.WriteLine("end: "+steps_num);
 
         write_solution(xc, u_prev, curr_t, N, GAMMA);
 

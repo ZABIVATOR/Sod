@@ -87,7 +87,7 @@ namespace Sod.CFL
                 }
             }
             if (write)
-                PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
+                PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file, "C:\\Users\\Alex\\source\\repos\\Sod\\1_results\\");
             while (T_END - curr_t > 0)
             {
 
@@ -152,14 +152,14 @@ namespace Sod.CFL
                 if (write)
                     if (0.0001 < curr_t & curr_t < 0.1 & Math.Round(curr_t % 0.005, presision) == 0)
                     {
-                        PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
+                        PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file, "C:\\Users\\Alex\\source\\repos\\Sod\\1_results\\");
                         
                     }
                     else
                     {
                         if (curr_t >= 0.1 & Math.Round(curr_t % 0.1, presision) == 0)
                         {
-                            PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
+                            PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file, "C:\\Users\\Alex\\source\\repos\\Sod\\1_results\\");
                         }
                     }
             }

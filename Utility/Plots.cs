@@ -14,7 +14,7 @@ namespace Sod.Utility
 {
     public abstract class Plots : Write
     {
-        public static void PlotBoth(Parameters param, double[,] v_cons1, double[,] v_cons2, string method,string method1, string method2)
+        public static void PlotBoth(Parameters param, double[,] v_cons1, double[,] v_cons2, string method,string method1, string method2, string path)
         {
             method = method + "both_";
             var time = param.stop_time;
@@ -37,7 +37,7 @@ namespace Sod.Utility
             double[,] exact = ExactSolution.Calculate(param, time);
 
 
-            var name = "C:\\Users\\priym\\source\\repos\\Sod\\1_results\\" + method + Math.Round(time * 1000) + "ms" + ".png";
+            var name = path+ method + Math.Round(time * 1000) + "ms" + ".png";
 
             var pm = new PlotModel()
             {
@@ -266,12 +266,13 @@ namespace Sod.Utility
             stream.Close();
         }
 
-        protected static void PlotSod(Parameters param, double[] xc, double[,] v_cons, double time, int N, double GAMMA, string method)
+        protected static void PlotSod(Parameters param, double[] xc, double[,] v_cons, double time, int N, double GAMMA, string method, string path)
         {
             double[,] exact = ExactSolution.Calculate(param, time);
 
 
-            var name = "C:\\Users\\priym\\source\\repos\\Sod\\1_results\\" + method + Math.Round(time * 1000) + "ms" + ".png";
+
+            var name = path + method + Math.Round(time * 1000) + "ms" + ".png";
 
             var pm = new PlotModel()
             {

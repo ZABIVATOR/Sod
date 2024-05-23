@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Graph
+namespace Sod
 {
-    public interface KernelOperations
+    public class KernelOperations
     {
         public static double[,] mult_matrixes(double[,] A, double[,] B)
         {

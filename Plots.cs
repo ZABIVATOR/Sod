@@ -7,31 +7,36 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Graph
+namespace Sod
 {
-    internal abstract class Plots
+    public abstract class Plots : Write
     {
-        public static void PLotAll()
+        static void PLotAll()
         {
-
-
-
-
+            throw new NotImplementedException();
         }
 
-        public static void PlotGraphOxyPlot(Parameters param, double[] xc, double[,] v_cons, double time, int N, double GAMMA, string name)
+        public static void PlotSodOxyPlot(Parameters param, double[] xc, double[,] v_cons, double time, int N, double GAMMA, string method)
         {
             double[,] exact = ExactSolution.Calculate(param, time);
 
 
-            name = "C:\\Users\\priym\\source\\repos\\Graph\\bin\\Debug\\net8.0-windows\\results\\" + name + Math.Round(time * 1000) + "ms" + ".png";
+            var name = "C:\\Users\\priym\\source\\repos\\Sod\\bin\\Debug\\net8.0-windows\\results\\" + method + Math.Round(time * 1000) + "ms" + ".png";
 
             var pm = new PlotModel()
             {
-                Title = $"results {Math.Round(time * 1000)} ms"
+                Title = $" time = {Math.Round(time * 1000)} ms"
             };
-            var ls1 = new LineSeries() { Title = "density", MarkerStrokeThickness = 0, MarkerStroke = OxyColors.Transparent,
-                MarkerSize = 3, MarkerType = MarkerType.Circle, MarkerFill = OxyColors.Green};
+            var ls1 = new LineSeries()
+            {
+                Title = "density",
+                MarkerStrokeThickness = 0,
+                MarkerStroke = OxyColors.Transparent,
+                LineStyle = LineStyle.None,
+                MarkerSize = 3,
+                MarkerType = MarkerType.Circle,
+                MarkerFill = OxyColors.Green
+            };
             var ls1_exact = new LineSeries() { Title = "density_exact", MarkerStroke = OxyColors.Black };
 
 
@@ -39,6 +44,7 @@ namespace Graph
             var ls2 = new LineSeries() { Title = "speed",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
+                LineStyle = LineStyle.None,
                 MarkerSize = 3,
                 MarkerType = MarkerType.Circle,
                 MarkerFill = OxyColors.Blue
@@ -48,6 +54,7 @@ namespace Graph
 
             var ls3 = new LineSeries() { Title = "pressure", MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
+                LineStyle = LineStyle.None,
                 MarkerSize = 3,
                 MarkerType = MarkerType.Circle,
                 MarkerFill = OxyColors.MediumPurple
@@ -58,6 +65,7 @@ namespace Graph
             var ls4 = new LineSeries() { Title = "energy",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
+                LineStyle = LineStyle.None,
                 MarkerSize = 3,
                 MarkerType = MarkerType.Circle,
                 MarkerFill = OxyColors.Red
@@ -162,7 +170,10 @@ namespace Graph
             var pngExporter = new OxyPlot.WindowsForms.PngExporter { Width = 1000, Height = 1000 };
             var stream = File.Create(name);
 
+
+
             pngExporter.Export(pm, stream);
+            stream.Close();
         }
 
     }

@@ -8,18 +8,24 @@ using CsvHelper;
 using CsvHelper.Configuration.Attributes;
 using System.IO;
 using System;
-using ScottPlot;
 using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.Axes;
 
-namespace Graph
+namespace Sod
 {
-    public class KIR : Plots, Write, KernelOperations
+    public class KIR : Plots
     {
-        
-        public static double [,] KIR_Calculate_and_WriteIfFlag(Parameters param, string result_name_file = "sod_",bool saveres = true, int boundary = 1)
+        Parameters param;
+        public KIR(Parameters par) {
+            param = par;
+        }
+
+        public double[,] Calculate_Write(string result_name_file, bool write = true)
         {
+            int boundary = 1;
+            result_name_file += "KIR_";
+
             double GAMMA = param.g;
             double T_END = param.stop_time;
 
@@ -32,6 +38,7 @@ namespace Graph
             double RIGHT_P = param.right_params[(int)Vector_index.P];
             int N = param.cells_number;
             int M = (int)Vector_index.M;
+
 
             double[] x = new double[N + 1];
             double[] xc = new double[N];
@@ -78,8 +85,8 @@ namespace Graph
                     u_prev[i, j] = temp[j];
                 }
             }
-            if (saveres)
-                Plots.PlotGraphOxyPlot(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
+            if (write)
+                Plots.PlotSodOxyPlot(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
             while (T_END - curr_t > 0)
             {
 
@@ -141,23 +148,24 @@ namespace Graph
 
                 curr_t += dt;
                 steps_num += 1;
-                if (saveres)
-                    if (curr_t < 0.1 & Math.Round(curr_t % 0.02, 3) == 0)
+                if (write)
+                    if (0.01 < curr_t & curr_t < 0.1 & Math.Round(curr_t % 0.02, 3) == 0)
                     {
-                        Plots.PlotGraphOxyPlot(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
+                        Plots.PlotSodOxyPlot(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
+                        
                     }
                     else
                     {
                         if (curr_t >= 0.1 & Math.Round(curr_t % 0.1, 3) == 0)
                         {
-                            Plots.PlotGraphOxyPlot(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
+                            Plots.PlotSodOxyPlot(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
                         }
                     }
             }
             return u_prev;
         }
 
-         static double[] diff_flux_cons(double[] v_cons, double GAMMA)
+        static double[] diff_flux_cons(double[] v_cons, double GAMMA)
         {
             int M = (int)Vector_index.M;
             double[] flux = new double[M];
@@ -171,7 +179,7 @@ namespace Graph
             return flux;
         }
 
-         static double[,] calc_omega(double[] v_cons, double GAMMA)
+        static double[,] calc_omega(double[] v_cons, double GAMMA)
         {
             int M = (int)Vector_index.M;
             double[,] omega = new double[M, M];
@@ -202,7 +210,7 @@ namespace Graph
             return omega;
         }
 
-         static double[,] calc_omega_inverse(double[] v_cons, double GAMMA)
+        static double[,] calc_omega_inverse(double[] v_cons, double GAMMA)
         {
             int M = (int)Vector_index.M;
             double[,] omega_inverse = new double[M, M];
@@ -232,7 +240,7 @@ namespace Graph
             return omega_inverse;
         }
 
-         static double[,] calc_lambda(double[] v_cons, double GAMMA)
+        static double[,] calc_lambda(double[] v_cons, double GAMMA)
         {
             int M = (int)Vector_index.M;
             double[,] lambda = new double[M, M];
@@ -255,7 +263,7 @@ namespace Graph
             return lambda;
         }
 
-         static double[] calc_flux(double[] left_params, double[] right_params, double GAMMA)
+        static double[] calc_flux(double[] left_params, double[] right_params, double GAMMA)
         {
             int M = (int)Vector_index.M;
             int i, j;
@@ -278,7 +286,7 @@ namespace Graph
             return flux;
         }
 
-         static double[,] cir_util(double[] cons_params, double GAMMA)
+        static double[,] cir_util(double[] cons_params, double GAMMA)
         {
             var omega = calc_omega(cons_params, GAMMA);
             var omega_inverse = calc_omega_inverse(cons_params, GAMMA);

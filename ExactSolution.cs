@@ -1,5 +1,4 @@
-﻿using ScottPlot.AxisLimitManagers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -8,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 
-namespace Graph
+namespace Sod
 {
     public class ExactSolution
     {
@@ -364,9 +363,7 @@ namespace Graph
             double cl, cr;              // скорости звука слева и справа от разрыва  
             double p_cont=0, v_cont=0;      // давление и скорость на контактном разрыве  
             double s;                   // текущее значение автомодельной переменной  
-            
-                Console.WriteLine("\nExact solution of the Riemann problem for the gas dynamics equations\n");
-
+          
                 // определение координат центров ячеек сетки  
                 build_grid(ref xc, ref x, - 0.5, 0.5, param.cells_number);
 

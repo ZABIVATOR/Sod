@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Graph
+namespace Sod
 {
-    public interface Write : KernelOperations
+    public abstract class Write : KernelOperations
     {
         public static void writeCSV_solution(double[] xc, double[,] v_cons, double time, int N, double GAMMA, string name)
         {

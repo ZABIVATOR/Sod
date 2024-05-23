@@ -21,7 +21,7 @@ namespace Sod
             double[,] exact = ExactSolution.Calculate(param, time);
 
 
-            var name = "C:\\Users\\priym\\source\\repos\\Sod\\1_results" + method + Math.Round(time * 1000) + "ms" + ".png";
+            var name = "C:\\Users\\priym\\source\\repos\\Sod\\1_results\\" + method + Math.Round(time * 1000) + "ms" + ".png";
 
             var pm = new PlotModel()
             {

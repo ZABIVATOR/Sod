@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace Sod
 {
@@ -15,11 +16,11 @@ namespace Sod
             param = par;
         }
 
-        /*
+        
         public double[,] Calculate_Write(string result_name_file, bool write = true, int presision = 3)
         {
-            int boundary = 1;
-            result_name_file += "KIR_";
+            int boundary = 0;
+            result_name_file += "Godunov_";
 
             double GAMMA = param.g;
             double T_END = param.stop_time;
@@ -97,7 +98,7 @@ namespace Sod
                             temp1[j] = u_prev[i - 1, j];
                             temp2[j] = u_prev[i, j];
                         }
-                        flux_left = calc_flux(temp1, temp2, GAMMA);
+                        flux_left = calc_flux(temp1, temp2, GAMMA, dt);
                     }
                     else
                     {
@@ -107,7 +108,7 @@ namespace Sod
                             temp[j] = u_prev[0, j];
                         }
                         boun_v = KernelOperations.boundary(temp, boundary);
-                        flux_left = calc_flux(boun_v, temp, GAMMA);
+                        flux_left = calc_flux(boun_v, temp, GAMMA, dt);
                     }
 
                     if (i != N - 1)
@@ -120,7 +121,7 @@ namespace Sod
                             temp2[j] = u_prev[i + 1, j];
                         }
 
-                        flux_right = calc_flux(temp1, temp2, GAMMA);
+                        flux_right = calc_flux(temp1, temp2, GAMMA, dt);
                     }
                     else
                     {
@@ -130,7 +131,7 @@ namespace Sod
                             temp[j] = u_prev[N - 1, j];
                         }
                         boun_v = KernelOperations.boundary(temp, boundary);
-                        flux_right = calc_flux(temp, boun_v, GAMMA);
+                        flux_right = calc_flux(temp, boun_v, GAMMA, dt);
                     }
 
                     for (int j = 0; j < M; j++)
@@ -143,6 +144,7 @@ namespace Sod
 
                 curr_t += dt;
                 steps_num += 1;
+                PlotSodOxyPlot(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
                 if (write)
                     if (0.01 < curr_t & curr_t < 0.1 & Math.Round(curr_t % 0.02, presision) == 0)
                     {
@@ -159,121 +161,16 @@ namespace Sod
             }
             return u_prev;
         }
-        */
-        static double[] diff_flux_cons(double[] v_cons, double GAMMA)
-        {
-            int M = (int)Vector_index.M;
-            double[] flux = new double[M];
-            double[] v_ncons = new double[M];
-
-            v_ncons = convert_cons_to_noncons(v_cons, GAMMA);
-
-            flux[0] = v_cons[1];                                    /* масса */
-            flux[1] = v_cons[1] * v_ncons[1] + v_ncons[2];          /* импульс */
-            flux[2] = (v_cons[2] + v_ncons[2]) * v_ncons[1];      /* полная энергия */
-            return flux;
-        }
-
-        static double[,] calc_omega(double[] v_cons, double GAMMA)
-        {
-            int M = (int)Vector_index.M;
-            double[,] omega = new double[M, M];
-            double[] v_ncons = new double[M];
-            double c;               /* скорость звука */
-            double teta, b, h;
-
-            v_ncons = convert_cons_to_noncons(v_cons, GAMMA);
-
-            c = calc_sound_velocity(v_ncons, GAMMA);
-
-            teta = 0.5 * v_ncons[1] * v_ncons[1];
-            b = GAMMA - 1.0;
-            h = 0.5 * v_ncons[1] * v_ncons[1] + GAMMA * v_ncons[2] / v_ncons[0] / (GAMMA - 1.0);
-
-            omega[0, 0] = 1.0;
-            omega[0, 1] = 1.0;
-            omega[0, 2] = 1.0;
-
-            omega[1, 0] = v_ncons[1] - c;
-            omega[1, 1] = v_ncons[1];
-            omega[1, 2] = v_ncons[1] + c;
-
-            omega[2, 0] = h - v_ncons[1] * c;
-            omega[2, 1] = h - c * c / b;
-            omega[2, 2] = h + v_ncons[1] * c;
-
-            return omega;
-        }
-
-        static double[,] calc_omega_inverse(double[] v_cons, double GAMMA)
-        {
-            int M = (int)Vector_index.M;
-            double[,] omega_inverse = new double[M, M];
-            double[] v_ncons = new double[M];
-            double c;               /* скорость звука */
-            double teta, b, h;
-
-            v_ncons = convert_cons_to_noncons(v_cons, GAMMA);
-
-            c = calc_sound_velocity(v_ncons, GAMMA);
-
-            teta = 0.5 * v_ncons[1] * v_ncons[1];
-            b = GAMMA - 1.0;
-            h = 0.5 * v_ncons[1] * v_ncons[1] + GAMMA * v_ncons[2] / v_ncons[0] / (GAMMA - 1.0);
-
-            omega_inverse[0, 0] = 0.5 * b * (teta + v_ncons[1] * c / b) / Math.Pow(c, 2.0);
-            omega_inverse[0, 1] = 0.5 * b * (-v_ncons[1] - c / b) / Math.Pow(c, 2.0);
-            omega_inverse[0, 2] = 0.5 * b / Math.Pow(c, 2.0);
-
-            omega_inverse[1, 0] = 0.5 * b * (2.0 * h - 2.0 * Math.Pow(v_ncons[1], 2.0)) / Math.Pow(c, 2.0);
-            omega_inverse[1, 1] = 0.5 * b * (2.0 * v_ncons[1]) / Math.Pow(c, 2.0);
-            omega_inverse[1, 2] = 0.5 * b * (-2.0) / Math.Pow(c, 2.0);
-
-            omega_inverse[2, 0] = 0.5 * b * (teta - v_ncons[1] * c / b) / Math.Pow(c, 2.0);
-            omega_inverse[2, 1] = 0.5 * b * (-v_ncons[1] + c / b) / Math.Pow(c, 2.0);
-            omega_inverse[2, 2] = 0.5 * b / Math.Pow(c, 2.0);
-            return omega_inverse;
-        }
-
-        static double[,] calc_lambda(double[] v_cons, double GAMMA)
-        {
-            int M = (int)Vector_index.M;
-            double[,] lambda = new double[M, M];
-            double[] v_ncons = new double[M];
-            double c;
-            v_ncons = convert_cons_to_noncons(v_cons, GAMMA);
-            c = calc_sound_velocity(v_ncons, GAMMA);
-
-            lambda[0, 0] = Math.Abs(v_ncons[1] - c);
-            lambda[0, 1] = 0.0;
-            lambda[0, 2] = 0.0;
-
-            lambda[1, 0] = 0.0;
-            lambda[1, 1] = Math.Abs(v_ncons[1]);
-            lambda[1, 2] = 0.0;
-
-            lambda[2, 0] = 0.0;
-            lambda[2, 1] = 0.0;
-            lambda[2, 2] = Math.Abs(v_ncons[1] + c);
-            return lambda;
-        }
-
-        static double[] calc_flux(double[] left_params, double[] right_params, double GAMMA)
+        
+        static double[] calc_flux(double[] left_params, double[] right_params, double GAMMA, double dt)
         {
             throw new NotImplementedException();
+            var param = new Parameters(101, dt, left_params, right_params, GAMMA);
+            var res = ExactSolution.Calculate(param);
 
+            return [res[50,0], res[50, 1], res[50, 2]];
         }
 
-        static double[,] cir_util(double[] cons_params, double GAMMA)
-        {
-            var omega = calc_omega(cons_params, GAMMA);
-            var omega_inverse = calc_omega_inverse(cons_params, GAMMA);
-            var lambda = calc_lambda(cons_params, GAMMA);
-
-            var m_tmp = mult_matrixes(omega, lambda);
-            return mult_matrixes(m_tmp, omega_inverse);
-        }
-        
     }
 
 }

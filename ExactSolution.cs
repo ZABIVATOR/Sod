@@ -38,7 +38,7 @@ namespace Sod
         }
 
         static double calc_sound_velocity(Parameters param, double[] v_ncons) {
-            return param.g * v_ncons[((int)Vector_index.P)] / v_ncons[((int)Vector_index.R)];
+            return Math.Sqrt(param.g * v_ncons[((int)Vector_index.P)] / v_ncons[((int)Vector_index.R)]);
         }
 
         static void calc_F_and_DF(ref double F, ref double DF, Parameters param, double curr_press, double[] v_ncons, double c)
@@ -102,9 +102,7 @@ namespace Sod
             pr = v_ncons_r[(int)Vector_index.P];
             g = param.g;
 
-            /* Начальное приближение из линейной задачи
-               Toro E.F. Riemann Solvers and Numerical Methods for Fluid Dynamics. - 2nd Edition. - Springer,
-               1999. - P. 128. - Formula (4.47).  */
+            //Начальное приближение из линейной задачи
             p_lin = Math.Max(0.0, 0.5 * (pl + pr) - 0.125 * (vr - vl) * (rl + rr) * (cl + cr));
             p_min = Math.Min(pl, pr);
             p_max = Math.Max(pl, pr);
@@ -120,17 +118,13 @@ namespace Sod
             {
                 if (p_lin < p_min)
                 {
-                    /* Начальное приближение по двум волнам разрежения
-                       Toro E.F. Riemann Solvers and Numerical Methods for Fluid Dynamics. - 2nd Edition. - Springer,
-                       1999. - P. 302. - Formula (9.32) + поправка на двучленное уравнение состояния  */
+                    // Начальное приближение по двум волнам разрежения
                     g1 = 0.5 * (g - 1.0) / g;
                     return Math.Pow(((cl + cr - 0.5 * (g - 1.0) * (vr - vl)) / (cl / Math.Pow(pl, g1) + cr / Math.Pow(pr, g1))), 1.0 / g1);
                 }
                 else
                 {
-                    /* Начальное приближение по двум ударным волнам
-                       Toro E.F. Riemann Solvers and Numerical Methods for Fluid Dynamics. - 2nd Edition. - Springer,
-                       1999. - P. 128. - Formula (4.48) + поправка на двучленное уравнение состояния  */
+                    // Начальное приближение по двум ударным волнам
                     g1 = 2.0 / (g + 1.0);
                     g2 = (g - 1.0) / (g + 1.0);
                     p1 = Math.Sqrt(g1 / rl / (g2 * pl + p_lin));
@@ -198,8 +192,7 @@ namespace Sod
 
             double rl, vl, pl;                      // примитивные переменные слева от разрыва  
             double rr, vr, pr;                      // примитивные переменные справа от разрыва  
-            double g1, g2, g3, g4, g5, g6, g7;      /* вспомогательные переменные, производные от показателя адиабаты,
-                                               в соответствии с Toro E.F. Riemann Solvers and Numerical Methods for Fluid Dynamics. - 2nd Edition. - Springer, 1999. - P. 153.  */
+            double g1, g2, g3, g4, g5, g6, g7;      // вспомогательные переменные, производные от показателя адиабаты
 
             // скорости левых волн  
             double shl, stl;        // скорости "головы" и "хвоста" левой волны разрежения  
@@ -352,9 +345,15 @@ namespace Sod
             return v_ncons_res;
         }
 
-        public static double[,] Calculate(Parameters SODparam, double curr_time)
+        public static double[,] Calculate(Parameters SODparam, double curr_time = -1)//отрицательное время для расчета по моменту из структуры параметров
         {
-            var param = new Parameters(SODparam.cells_number, curr_time, SODparam.left_params, SODparam.right_params, SODparam.g);
+            var param = new Parameters();
+            if (curr_time < 0)
+            {
+                param = SODparam;
+            }
+            else
+                param = new Parameters(SODparam.cells_number, curr_time, SODparam.left_params, SODparam.right_params, SODparam.g);
 
             double[,] v_ncons_res = new double[param.cells_number, (int)Vector_index.M];      // решение  
             

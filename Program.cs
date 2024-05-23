@@ -17,7 +17,7 @@ namespace Sod
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
 
-            string result_name_file = "sod_";
+            string result_name_file = "sod_fix";
             double GAMMA = 1.4;
             double T_END = 1;
 
@@ -28,7 +28,7 @@ namespace Sod
             double RIGHT_R = 0.125;
             double RIGHT_U = 0;
             double RIGHT_P = 0.1;
-            int N = 1000;
+            int N = 5000;
             var param = new Parameters(N, T_END, [LEFT_R, LEFT_U, LEFT_P], [RIGHT_R, RIGHT_U, RIGHT_P], GAMMA);
 
             var kir = new KIR(param);
@@ -36,7 +36,7 @@ namespace Sod
 
 
             var gg = new Godunov(param);
-            Console.WriteLine(gg.Calculate_Write(result_name_file));
+            //Console.WriteLine(gg.Calculate_Write(result_name_file)); return base from KIR
 
 
             return;

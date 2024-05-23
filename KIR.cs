@@ -21,7 +21,7 @@ namespace Sod
             param = par;
         }
 
-        public double[,] Calculate_Write(string result_name_file, bool write = true)
+        public double[,] Calculate_Write(string result_name_file, bool write = true, int presision = 3)
         {
             int boundary = 1;
             result_name_file += "KIR_";
@@ -149,14 +149,14 @@ namespace Sod
                 curr_t += dt;
                 steps_num += 1;
                 if (write)
-                    if (0.01 < curr_t & curr_t < 0.1 & Math.Round(curr_t % 0.02, 3) == 0)
+                    if (0.01 < curr_t & curr_t < 0.1 & Math.Round(curr_t % 0.02, presision) == 0)
                     {
                         PlotSodOxyPlot(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
                         
                     }
                     else
                     {
-                        if (curr_t >= 0.1 & Math.Round(curr_t % 0.1, 3) == 0)
+                        if (curr_t >= 0.1 & Math.Round(curr_t % 0.1, presision) == 0)
                         {
                             PlotSodOxyPlot(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
                         }

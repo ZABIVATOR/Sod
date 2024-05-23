@@ -79,7 +79,7 @@ namespace Sod
                 curr_step = (x[i + 1] - x[i]) / (Math.Abs(v_ncons[1]) + c);
                 if (time_step_number < 5)
                 {
-                    curr_step *= 0.2;
+                    curr_step *= 0.1;
                 }
                 else
                 {
@@ -95,9 +95,8 @@ namespace Sod
 
         public static double calc_sound_velocity(double[] v_ncons, double GAMMA)
         {
-            return (Math.Sqrt(GAMMA * v_ncons[2] / v_ncons[0]));
+            return Math.Sqrt(GAMMA * v_ncons[((int)Vector_index.P)] / v_ncons[((int)Vector_index.R)]);
         }
-
 
     }
 }

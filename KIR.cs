@@ -79,18 +79,18 @@ namespace Sod
                     v[1] = RIGHT_U;
                     v[2] = RIGHT_P;
                 }
-                var temp = KernelOperations.convert_noncons_to_cons(v, GAMMA);
+                var temp = convert_noncons_to_cons(v, GAMMA);
                 for (int j = 0; j < M; j++)
                 {
                     u_prev[i, j] = temp[j];
                 }
             }
             if (write)
-                Plots.PlotSodOxyPlot(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
+                PlotSodOxyPlot(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
             while (T_END - curr_t > 0)
             {
 
-                dt = KernelOperations.calc_time_step(x, u_prev, steps_num, N, GAMMA);
+                dt = calc_time_step(x, u_prev, steps_num, N, GAMMA);
                 for (int i = 0; i < N; i++)
                 {
                     if (i != 0)
@@ -102,7 +102,7 @@ namespace Sod
                             temp1[j] = u_prev[i - 1, j];
                             temp2[j] = u_prev[i, j];
                         }
-                        flux_left = KIR.calc_flux(temp1, temp2, GAMMA);
+                        flux_left = calc_flux(temp1, temp2, GAMMA);
                     }
                     else
                     {
@@ -112,7 +112,7 @@ namespace Sod
                             temp[j] = u_prev[0, j];
                         }
                         boun_v = KernelOperations.boundary(temp, boundary);
-                        flux_left = KIR.calc_flux(boun_v, temp, GAMMA);
+                        flux_left = calc_flux(boun_v, temp, GAMMA);
                     }
 
                     if (i != N - 1)
@@ -125,7 +125,7 @@ namespace Sod
                             temp2[j] = u_prev[i + 1, j];
                         }
 
-                        flux_right = KIR.calc_flux(temp1, temp2, GAMMA);
+                        flux_right = calc_flux(temp1, temp2, GAMMA);
                     }
                     else
                     {
@@ -135,7 +135,7 @@ namespace Sod
                             temp[j] = u_prev[N - 1, j];
                         }
                         boun_v = KernelOperations.boundary(temp, boundary);
-                        flux_right = KIR.calc_flux(temp, boun_v, GAMMA);
+                        flux_right = calc_flux(temp, boun_v, GAMMA);
                     }
 
                     for (int j = 0; j < M; j++)
@@ -151,14 +151,14 @@ namespace Sod
                 if (write)
                     if (0.01 < curr_t & curr_t < 0.1 & Math.Round(curr_t % 0.02, 3) == 0)
                     {
-                        Plots.PlotSodOxyPlot(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
+                        PlotSodOxyPlot(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
                         
                     }
                     else
                     {
                         if (curr_t >= 0.1 & Math.Round(curr_t % 0.1, 3) == 0)
                         {
-                            Plots.PlotSodOxyPlot(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
+                            PlotSodOxyPlot(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
                         }
                     }
             }
@@ -171,7 +171,7 @@ namespace Sod
             double[] flux = new double[M];
             double[] v_ncons = new double[M];
 
-            v_ncons = KernelOperations.convert_cons_to_noncons(v_cons, GAMMA);
+            v_ncons = convert_cons_to_noncons(v_cons, GAMMA);
 
             flux[0] = v_cons[1];                                    /* масса */
             flux[1] = v_cons[1] * v_ncons[1] + v_ncons[2];          /* импульс */
@@ -187,9 +187,9 @@ namespace Sod
             double c;               /* скорость звука */
             double teta, b, h;
 
-            v_ncons = KernelOperations.convert_cons_to_noncons(v_cons, GAMMA);
+            v_ncons = convert_cons_to_noncons(v_cons, GAMMA);
 
-            c = KernelOperations.calc_sound_velocity(v_ncons, GAMMA);
+            c = calc_sound_velocity(v_ncons, GAMMA);
 
             teta = 0.5 * v_ncons[1] * v_ncons[1];
             b = GAMMA - 1.0;
@@ -218,9 +218,9 @@ namespace Sod
             double c;               /* скорость звука */
             double teta, b, h;
 
-            v_ncons = KernelOperations.convert_cons_to_noncons(v_cons, GAMMA);
+            v_ncons = convert_cons_to_noncons(v_cons, GAMMA);
 
-            c = KernelOperations.calc_sound_velocity(v_ncons, GAMMA);
+            c = calc_sound_velocity(v_ncons, GAMMA);
 
             teta = 0.5 * v_ncons[1] * v_ncons[1];
             b = GAMMA - 1.0;
@@ -246,8 +246,8 @@ namespace Sod
             double[,] lambda = new double[M, M];
             double[] v_ncons = new double[M];
             double c;
-            v_ncons = KernelOperations.convert_cons_to_noncons(v_cons, GAMMA);
-            c = KernelOperations.calc_sound_velocity(v_ncons, GAMMA);
+            v_ncons = convert_cons_to_noncons(v_cons, GAMMA);
+            c = calc_sound_velocity(v_ncons, GAMMA);
 
             lambda[0, 0] = Math.Abs(v_ncons[1] - c);
             lambda[0, 1] = 0.0;
@@ -292,8 +292,8 @@ namespace Sod
             var omega_inverse = calc_omega_inverse(cons_params, GAMMA);
             var lambda = calc_lambda(cons_params, GAMMA);
 
-            var m_tmp = KernelOperations.mult_matrixes(omega, lambda);
-            return KernelOperations.mult_matrixes(m_tmp, omega_inverse);
+            var m_tmp = mult_matrixes(omega, lambda);
+            return mult_matrixes(m_tmp, omega_inverse);
         }
 
     }

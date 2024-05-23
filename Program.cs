@@ -6,8 +6,6 @@ using System;
 
 namespace Sod
 {
-
-
     internal static class Program
     {
         /// <summary>
@@ -38,7 +36,7 @@ namespace Sod
 
 
             var gg = new Godunov(param);
-            gg.Calculate_Write(result_name_file);
+            Console.WriteLine(gg.Calculate_Write(result_name_file));
 
 
             return;

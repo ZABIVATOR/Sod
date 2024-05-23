@@ -84,7 +84,7 @@ namespace Sod
                 double[] t = new double[3];
                 for (int j = 0; j < 3; j++)
                     t[j] = v_cons[i, j];
-                v_ncons = KernelOperations.convert_cons_to_noncons(t, GAMMA);
+                v_ncons = convert_cons_to_noncons(t, GAMMA);
 
                 density[i] = v_ncons[0];
                 speed[i] = v_ncons[1];
@@ -111,8 +111,8 @@ namespace Sod
             var linearAxis1 = new LinearAxis();
             linearAxis1.EndPosition = 0.99;
             linearAxis1.StartPosition = 0.77;
-            linearAxis1.MajorGridlineStyle = OxyPlot.LineStyle.Solid;
-            linearAxis1.MinorGridlineStyle = OxyPlot.LineStyle.Dot;
+            linearAxis1.MajorGridlineStyle = LineStyle.Solid;
+            linearAxis1.MinorGridlineStyle = LineStyle.Dot;
             linearAxis1.Title = "density";
             linearAxis1.Key = "Series 1";
             ls1.YAxisKey = "Series 1";
@@ -126,8 +126,8 @@ namespace Sod
             var linearAxis2 = new LinearAxis();
             linearAxis2.EndPosition = 0.74;
             linearAxis2.StartPosition = 0.52;
-            linearAxis2.MajorGridlineStyle = OxyPlot.LineStyle.Solid;
-            linearAxis2.MinorGridlineStyle = OxyPlot.LineStyle.Dot;
+            linearAxis2.MajorGridlineStyle = LineStyle.Solid;
+            linearAxis2.MinorGridlineStyle = LineStyle.Dot;
             linearAxis2.Title = "pressure";
             linearAxis2.Key = "Series 2";
             ls2.YAxisKey = "Series 2";
@@ -140,8 +140,8 @@ namespace Sod
             var linearAxis3 = new LinearAxis();
             linearAxis3.EndPosition = 0.48;
             linearAxis3.StartPosition = 0.26;
-            linearAxis3.MajorGridlineStyle = OxyPlot.LineStyle.Solid;
-            linearAxis3.MinorGridlineStyle = OxyPlot.LineStyle.Dot;
+            linearAxis3.MajorGridlineStyle = LineStyle.Solid;
+            linearAxis3.MinorGridlineStyle = LineStyle.Dot;
             linearAxis3.Title = "speed";
             linearAxis3.Key = "Series 3";
             ls3.YAxisKey = "Series 3";
@@ -154,8 +154,8 @@ namespace Sod
             var linearAxis4 = new LinearAxis();
             linearAxis4.EndPosition = 0.23;
             linearAxis4.StartPosition = 0.01;
-            linearAxis4.MajorGridlineStyle = OxyPlot.LineStyle.Solid;
-            linearAxis4.MinorGridlineStyle = OxyPlot.LineStyle.Dot;
+            linearAxis4.MajorGridlineStyle = LineStyle.Solid;
+            linearAxis4.MinorGridlineStyle = LineStyle.Dot;
             linearAxis4.Title = "energy";
             linearAxis4.Key = "Series 4";
             ls4.YAxisKey = "Series 4";

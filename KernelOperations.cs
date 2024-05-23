@@ -74,7 +74,7 @@ namespace Sod
                 double[] t = new double[3];
                 for (int j = 0; j < 3; j++)
                     t[j] = v_cons[i, j];
-                v_ncons = KernelOperations.convert_cons_to_noncons(t, GAMMA);
+                v_ncons = convert_cons_to_noncons(t, GAMMA);
                 c = calc_sound_velocity(v_ncons, GAMMA);
                 curr_step = (x[i + 1] - x[i]) / (Math.Abs(v_ncons[1]) + c);
                 if (time_step_number < 5)

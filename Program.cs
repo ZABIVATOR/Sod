@@ -3,6 +3,8 @@ using CsvHelper.Configuration.Attributes;
 using System.Globalization;
 using System.IO;
 using System;
+using Sod.CFL;
+using Sod.Utility;
 
 namespace Sod
 {

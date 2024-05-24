@@ -1,25 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
+using CsvHelper;
+using CsvHelper.Configuration.Attributes;
+using System.IO;
+using System;
+using OxyPlot;
+using OxyPlot.Series;
+using OxyPlot.Axes;
+using Sod.Utility;
 
-namespace Sod
+namespace Sod.CFL
 {
-    public class Godunov : Plots, CFLmethod
+    public class KIR : Plots, CFLmethod
     {
-
         Parameters param;
-        public Godunov(Parameters par)
-        {
+        public KIR(Parameters par) {
             param = par;
         }
 
         public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3)
         {
             int boundary = 1;
-            result_name_file += "Godunov_";
+            result_name_file += "KIR_";
 
             double GAMMA = param.g;
             double T_END = param.stop_time;
@@ -147,7 +153,7 @@ namespace Sod
                     if (0.01 < curr_t & curr_t < 0.1 & Math.Round(curr_t % 0.02, presision) == 0)
                     {
                         PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
-
+                        
                     }
                     else
                     {
@@ -162,42 +168,36 @@ namespace Sod
 
         static double[] CalculateFlux(double[] left_params, double[] right_params, double GAMMA)
         {
-            var parameters = new Parameters((int)Vector_index.M,1e-6,left_params,right_params,GAMMA);
-            var exact = ExactSolution.Calculate(parameters, GAMMA);
-            exact = ConvertConsToPrimitive(exact,GAMMA);
+            ConvertConsToPrimitive(left_params, GAMMA);
+            ConvertConsToPrimitive(right_params, GAMMA);
+            var leftspeed = CalculateSoundVelocity(left_params, GAMMA)+left_params[1];
+            var rightspeed = CalculateSoundVelocity(right_params, GAMMA)+right_params[1];
+            var maxspeed = Math.Max(leftspeed, rightspeed);
+            ConvertPrimToConservative(left_params, GAMMA);
+            ConvertPrimToConservative(right_params, GAMMA);
 
-            return res(left_params, right_params, GAMMA);
-        }
-
-        static double[,] FindOwnValues(double[] cons_params, double GAMMA)
-        {
-            var omega = calc_omega(cons_params, GAMMA);
-            var omega_inverse = calc_omega_inverse(cons_params, GAMMA);
-            var lambda = calc_lambda(cons_params, GAMMA);
-
-            var m_tmp = MultuplyMatrixes(omega, lambda);
-            return MultuplyMatrixes(m_tmp, omega_inverse);
-        }
-
-        static double[] res(double[] left_params, double[] right_params, double GAMMA)
-        {
             int M = (int)Vector_index.M;
             int i, j;
             double[] flux = new double[M];
-            double[,] m_left = new double[M, M];
-            double[,] m_right = new double[M, M];
 
             var left_diff_flux = ConservativeDifference(left_params, GAMMA);
             var right_diff_flux = ConservativeDifference(right_params, GAMMA);
 
-            m_left = FindOwnValues(left_params, GAMMA);
-            m_right = FindOwnValues(right_params, GAMMA);
+            double[,] omega_r_L_omega_l = new double[3,3];
+            //rusanov
+            for (i = 0; i < M; i++)
+                for (j = 0; j < M; j++)
+                {
+                    omega_r_L_omega_l[i, j] = 0;
+                    if (i==j)
+                        omega_r_L_omega_l[i, j] = maxspeed;
+                }
 
             for (i = 0; i < M; i++)
             {
                 flux[i] = 0.5 * (left_diff_flux[i] + right_diff_flux[i]);
                 for (j = 0; j < M; j++)
-                    flux[i] += 0.5 * (0.5 * (m_left[i, j] + m_right[i, j])) * (left_params[j] - right_params[j]);
+                    flux[i] += 0.5 * (omega_r_L_omega_l[i, j]) * (left_params[j] - right_params[j]);
             }
 
             return flux;

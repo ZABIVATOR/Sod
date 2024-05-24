@@ -28,7 +28,7 @@ namespace Sod
                 double[] t = new double[3];
                 for (j = 0; j < 3; j++)
                     t[j] = v_cons[i, j];
-                v_ncons = convert_cons_to_noncons(t, GAMMA);
+                v_ncons = ConvertConsToPrimitive(t, GAMMA);
                 for (j = 0; j < 3; j++)
                 {
                     csv.WriteField(v_ncons[j]);
@@ -55,7 +55,7 @@ namespace Sod
                 double[] t = new double[3];
                 for (j = 0; j < 3; j++)
                     t[j] = v_cons[i, j];
-                v_ncons = convert_cons_to_noncons(t, GAMMA);
+                v_ncons = ConvertConsToPrimitive(t, GAMMA);
                 for (j = 0; j < 3; j++)
                 {
                     f.Write(v_ncons[j]);

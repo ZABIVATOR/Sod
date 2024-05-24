@@ -8,36 +8,29 @@ namespace Sod
 {
     internal static class Program
     {
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
-        [STAThread]
         static void Main()
-        {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
+        {string result_name_file = "sod_";
+            double gamma = 1.4;
+            double time = 0.05;
+            int N = 200;
 
-            string result_name_file = "sod_";
-            double GAMMA = 1.4;
-            double T_END = 1;
+            double ro_left = 1;
+            double u_left = 0;
+            double p_left = 1;
 
-            double LEFT_R = 1;
-            double LEFT_U = 0;
-            double LEFT_P = 1;
+            double ro_right = 0.125;
+            double u_right = 0;
+            double p_right = 0.1;
 
-            double RIGHT_R = 0.125;
-            double RIGHT_U = 0;
-            double RIGHT_P = 0.1;
-            int N = 1000;
-            var param = new Parameters(N, T_END, [LEFT_R, LEFT_U, LEFT_P], [RIGHT_R, RIGHT_U, RIGHT_P], GAMMA);
+            var param = new Parameters(N, time, [ro_left, u_left, p_left], [ro_right, u_right, p_right], gamma);
 
             var kir = new KIR(param);
-            kir.Calculate_Write(result_name_file);
-
+            var k = kir.CalculateWrite(result_name_file,false);
 
             var gg = new Godunov(param);
-            //gg.Calculate_Write(result_name_file);
+            var g = gg.CalculateWrite(result_name_file, false);
 
+            Plots.PlotBoth(param, k, g, result_name_file); 
 
             return;
 

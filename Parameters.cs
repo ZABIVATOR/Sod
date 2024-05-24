@@ -16,21 +16,10 @@ namespace Sod
 
     public struct Parameters
     {
-        // СЕТКА ДЛЯ ПОСТРОЕНИЯ ТОЧНОГО РЕШЕНИЯ  
-
         public int cells_number { get; set; }        // число ячеек  
-
-        // ВРЕМЯ ВЫВОДА  
-
         public double stop_time { get; set; }            // момент времени, для которого строится точное решение  
-
-        // НАЧАЛЬНЫЕ УСЛОВИЯ  
-
         public double[] left_params { get; set; }     // вектор примитивных переменных слева от разрыва  
         public double[] right_params { get; set; }    // вектор примитивных переменных справа от разрыва  
-
-        // УРАВНЕНИе СОСТОЯНИЯ  
-
         public double g { get; set; }                     // показатель адибаты  
 
         public Parameters(int cells_number, double stop_time, double[] left_params, double[] right_params, double g)
@@ -42,5 +31,10 @@ namespace Sod
             this.g = g;
         }
 
-    };
+    }
+
+    public interface CFLmethod
+    {
+        public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3);
+    }
 }

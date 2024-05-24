@@ -11,10 +11,12 @@ namespace Sod
     internal static class Program
     {
         static void Main()
-        {string result_name_file = "sod_";
+        {
+
+            int N = 800;
+            string result_name_file = $"Sod ";
             double gamma = 1.4;
-            double time = 0.05;
-            int N = 200;
+            double time = 0.01;
 
             double ro_left = 1;
             double u_left = 0;
@@ -30,7 +32,7 @@ namespace Sod
             var k = kir.CalculateWrite(result_name_file,false);
 
             var gg = new Godunov(param);
-            var g = gg.CalculateWrite(result_name_file, false);
+            var g = gg.CalculateWrite(result_name_file,false);
 
             Plots.PlotBoth(param, k, g, result_name_file); 
 

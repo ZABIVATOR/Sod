@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Sod.CFL;
+using OxyPlot.Legends;
+using System.Windows.Media.Animation;
 
 namespace Sod.Utility
 {
@@ -43,7 +45,7 @@ namespace Sod.Utility
             };
             var ls1 = new LineSeries()
             {
-                Title = "density",
+                Title = "KIR density",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,
@@ -53,62 +55,62 @@ namespace Sod.Utility
             };
             var ls1_ = new LineSeries()
             {
-                Title = "density",
+                Title = "Godunov density",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,
                 MarkerSize = 3,
-                MarkerType = MarkerType.Square,
-                MarkerFill = OxyColors.DarkGreen,
+                MarkerType = MarkerType.Triangle,
+                MarkerFill = OxyColors.Red,
             };
-            var ls1_exact = new LineSeries() { Title = "density_exact", MarkerStroke = OxyColors.Black };
+                var ls1_exact = new LineSeries() { Title = "Exact density", MarkerStrokeThickness = 0.5, Color = OxyColors.Black };
 
 
             //поменял местами для красоты
             var ls2 = new LineSeries()
             {
-                Title = "speed",
+                Title = "KIR speed",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,
                 MarkerSize = 3,
                 MarkerType = MarkerType.Circle,
-                MarkerFill = OxyColors.Blue
+                MarkerFill = OxyColors.GreenYellow
             };
             var ls2_ = new LineSeries()
             {
-                Title = "speed",
+                Title = "Godunov speed",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,
                 MarkerSize = 3,
-                MarkerType = MarkerType.Square,
-                MarkerFill = OxyColors.DarkBlue,
+                MarkerType = MarkerType.Triangle,
+                MarkerFill = OxyColors.OrangeRed,
             };
-            var ls2_exact = new LineSeries() { Title = "speed_exact", MarkerStroke = OxyColors.Black };
+            var ls2_exact = new LineSeries() { Title = "Exact speed", MarkerStrokeThickness = 0.5, Color = OxyColors.Black,  };
 
 
             var ls3 = new LineSeries()
             {
-                Title = "pressure",
+                Title = "KIR pressure",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,
                 MarkerSize = 3,
                 MarkerType = MarkerType.Circle,
-                MarkerFill = OxyColors.Purple
+                MarkerFill = OxyColors.LawnGreen
             };
             var ls3_ = new LineSeries()
             {
-                Title = "speed",
+                Title = "Godunov speed",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,
                 MarkerSize = 3,
-                MarkerType = MarkerType.Square,
-                MarkerFill = OxyColors.DarkViolet,
+                MarkerType = MarkerType.Triangle,
+                MarkerFill = OxyColors.Crimson
             };
-            var ls3_exact = new LineSeries() { Title = "pressure_exact", MarkerStroke = OxyColors.Black };
+            var ls3_exact = new LineSeries() { Title = "Exact pressure", MarkerStrokeThickness = 0.5, Color = OxyColors.Black,  };
 
             /*
             var ls4 = new LineSeries()
@@ -190,11 +192,12 @@ namespace Sod.Utility
             ls1.YAxisKey = "Series 1";
             ls1_.YAxisKey = "Series 1";
             ls1_exact.YAxisKey = "Series 1";
+            
 
             pm.Axes.Add(linearAxis1);
+            pm.Series.Add(ls1_exact);
             pm.Series.Add(ls1);
             pm.Series.Add(ls1_);
-            pm.Series.Add(ls1_exact);
 
 
             var linearAxis2 = new LinearAxis();
@@ -209,13 +212,13 @@ namespace Sod.Utility
             ls2_exact.YAxisKey = "Series 2";
 
             pm.Axes.Add(linearAxis2);
+            pm.Series.Add(ls2_exact);
             pm.Series.Add(ls2);
             pm.Series.Add(ls2_);
-            pm.Series.Add(ls2_exact);
 
             var linearAxis3 = new LinearAxis();
             linearAxis3.EndPosition = 0.32;
-            linearAxis3.StartPosition = 0.1;
+            linearAxis3.StartPosition = 0.01;
             linearAxis3.MajorGridlineStyle = LineStyle.Solid;
             linearAxis3.MinorGridlineStyle = LineStyle.Dot;
             linearAxis3.Title = "speed";
@@ -225,9 +228,9 @@ namespace Sod.Utility
             ls3_exact.YAxisKey = "Series 3";
 
             pm.Axes.Add(linearAxis3);
+            pm.Series.Add(ls3_exact);
             pm.Series.Add(ls3);
             pm.Series.Add(ls3_);
-            pm.Series.Add(ls3_exact);
 
             /*
             var linearAxis4 = new LinearAxis();
@@ -249,6 +252,13 @@ namespace Sod.Utility
 
             pm.Background = OxyColors.White;
 
+            pm.Legends.Add(new Legend
+            {
+                LegendPlacement = LegendPlacement.Outside,
+                LegendPosition = LegendPosition.RightMiddle,
+                LegendOrientation = LegendOrientation.Vertical,
+            });
+
             var pngExporter = new OxyPlot.WindowsForms.PngExporter { Width = 1000, Height = 1000 };
             var stream = File.Create(name);
 
@@ -265,46 +275,46 @@ namespace Sod.Utility
 
             var pm = new PlotModel()
             {
-                Title = $" time = {Math.Round(time * 1000)} ms"
+                Title = $" time = {Math.Round(time * 1000)} ms",
             };
             var ls1 = new LineSeries()
             {
-                Title = "density",
+                Title = "Density",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,
-                MarkerSize = 3,
+                MarkerSize = 2,
                 MarkerType = MarkerType.Circle,
                 MarkerFill = OxyColors.Green
             };
-            var ls1_exact = new LineSeries() { Title = "density_exact", MarkerStroke = OxyColors.Black };
+            var ls1_exact = new LineSeries() { Title = "EXact density", Color = OxyColors.Black, };
 
 
             //поменял местами для красоты
             var ls2 = new LineSeries()
             {
-                Title = "speed",
+                Title = "Speed",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,
-                MarkerSize = 3,
+                MarkerSize = 2,
                 MarkerType = MarkerType.Circle,
                 MarkerFill = OxyColors.Blue
             };
-            var ls2_exact = new LineSeries() { Title = "speed_exact", MarkerStroke = OxyColors.Black };
+            var ls2_exact = new LineSeries() { Title = "Exact speed", Color = OxyColors.Black, };
 
 
             var ls3 = new LineSeries()
             {
-                Title = "pressure",
+                Title = "Pressure",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,
-                MarkerSize = 3,
+                MarkerSize = 2,
                 MarkerType = MarkerType.Circle,
-                MarkerFill = OxyColors.MediumPurple
+                MarkerFill = OxyColors.Red
             };
-            var ls3_exact = new LineSeries() { Title = "pressure_exact", MarkerStroke = OxyColors.Black };
+            var ls3_exact = new LineSeries() { Title = "Exact pressure", Color = OxyColors.Black, };
 
             /*
             var ls4 = new LineSeries() { Title = "energy",
@@ -358,15 +368,15 @@ namespace Sod.Utility
             linearAxis1.StartPosition = 0.67;
             linearAxis1.MajorGridlineStyle = LineStyle.Solid;
             linearAxis1.MinorGridlineStyle = LineStyle.Dot;
+            
             linearAxis1.Title = "density";
             linearAxis1.Key = "Series 1";
             ls1.YAxisKey = "Series 1";
             ls1_exact.YAxisKey = "Series 1";
 
             pm.Axes.Add(linearAxis1);
-            pm.Series.Add(ls1);
             pm.Series.Add(ls1_exact);
-
+            pm.Series.Add(ls1);
 
             var linearAxis2 = new LinearAxis();
             linearAxis2.EndPosition = 0.65;
@@ -379,12 +389,12 @@ namespace Sod.Utility
             ls2_exact.YAxisKey = "Series 2";
 
             pm.Axes.Add(linearAxis2);
-            pm.Series.Add(ls2);
             pm.Series.Add(ls2_exact);
+            pm.Series.Add(ls2);
 
             var linearAxis3 = new LinearAxis();
             linearAxis3.EndPosition = 0.32;
-            linearAxis3.StartPosition = 0.1;
+            linearAxis3.StartPosition = 0.01;
             linearAxis3.MajorGridlineStyle = LineStyle.Solid;
             linearAxis3.MinorGridlineStyle = LineStyle.Dot;
             linearAxis3.Title = "speed";
@@ -393,8 +403,17 @@ namespace Sod.Utility
             ls3_exact.YAxisKey = "Series 3";
 
             pm.Axes.Add(linearAxis3);
-            pm.Series.Add(ls3);
             pm.Series.Add(ls3_exact);
+            pm.Series.Add(ls3);
+
+
+            pm.Legends.Add(new Legend
+             {
+                 LegendPlacement = LegendPlacement.Outside,
+                 LegendPosition = LegendPosition.BottomCenter,
+                 LegendOrientation = LegendOrientation.Horizontal,
+             });
+
 
             /*
             var linearAxis4 = new LinearAxis();
@@ -416,8 +435,6 @@ namespace Sod.Utility
 
             var pngExporter = new OxyPlot.WindowsForms.PngExporter { Width = 1000, Height = 1000 };
             var stream = File.Create(name);
-
-
 
             pngExporter.Export(pm, stream);
             stream.Close();

@@ -113,7 +113,7 @@ namespace Sod.CFL
             return boun_v;
         }
 
-        protected static double CalculateTimeStep(double[] x, double[,] v_cons, int time_step_number, int N, double GAMMA)
+        protected static double CalculateTimeStep(double[] x, double[,] v_cons, int N, double GAMMA)
         {
             int i;
             double new_step = 1e10;
@@ -129,14 +129,6 @@ namespace Sod.CFL
                 v_ncons = ConvertConsToPrimitive(t, GAMMA);
                 c = CalculateSoundVelocity(v_ncons, GAMMA);
                 curr_step = (x[i + 1] - x[i]) / (Math.Abs(v_ncons[1]) + c);
-                if (time_step_number < 5)
-                {
-                    curr_step *= 0.2;
-                }
-                else
-                {
-                    curr_step *= 0.2;
-                }
                 if (curr_step < new_step)
                     new_step = curr_step;
             }

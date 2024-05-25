@@ -9,7 +9,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace Sod.CFL
 {
-    public class Godunov : Plots, CFLmethod
+    public class Godunov : Plots
     {
 
         Parameters param;
@@ -18,7 +18,7 @@ namespace Sod.CFL
             param = par;
         }
 
-        public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3)
+        public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3, double CFL = 0.2)
         {
             int boundary = 1;
             result_name_file += "Godunov_";
@@ -87,7 +87,7 @@ namespace Sod.CFL
             while (T_END - curr_t > 0)
             {
 
-                dt = CalculateTimeStep(x, u_prev, steps_num, N, GAMMA);
+                dt = CFL*CalculateTimeStep(x, u_prev, N, GAMMA);
                 for (int i = 0; i < N; i++)
                 {
                     if (i != 0)
@@ -146,7 +146,7 @@ namespace Sod.CFL
                 curr_t += dt;
                 steps_num += 1;
                 if (write)
-                    if (0.01 < curr_t & curr_t < 0.1 & Math.Round(curr_t % 0.02, presision) == 0)
+                    if (0.0001 < curr_t & curr_t < 0.1 & Math.Round(curr_t % 0.005, presision) == 0)
                     {
                         PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
 

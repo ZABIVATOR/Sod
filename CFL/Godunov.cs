@@ -108,7 +108,7 @@ namespace Sod.CFL
                         {
                             temp[j] = u_prev[0, j];
                         }
-                        boun_v = KernelOperations.BoundaryCondition(temp, boundary);
+                        boun_v = BoundaryCondition(temp, boundary);
                         flux_left = CalculateFlux(boun_v, temp, GAMMA);
                     }
 
@@ -131,7 +131,7 @@ namespace Sod.CFL
                         {
                             temp[j] = u_prev[N - 1, j];
                         }
-                        boun_v = KernelOperations.BoundaryCondition(temp, boundary);
+                        boun_v = BoundaryCondition(temp, boundary);
                         flux_right = CalculateFlux(temp, boun_v, GAMMA);
                     }
 
@@ -164,21 +164,50 @@ namespace Sod.CFL
 
         static double[] CalculateFlux(double[] left_params, double[] right_params, double GAMMA)
         {
+            //int i;
+            //double h;   // шаг сетки  
+            //h = (right_boundary_x - left_boundary_x) / cells_num;
+            //координаты узлов
+            //for (i = 0; i < cells_num + 1; i++)
+            //{
+            //    x[i] = left_boundary_x + i * h;
+            //}
+            //координаты центров ячеек
+            //for (i = 0; i < cells_num; i++)
+            //{
+            //    xc[i] = 0.5 * (x[i] + x[i + 1]);
+            //}
+
             var parameters = new Parameters((int)Vector_index.M,1e-6,left_params,right_params,GAMMA);
             var exact = ExactSolution.Calculate(parameters, GAMMA);
             exact = ConvertConsToPrimitive(exact,GAMMA);
 
+            //double r, v, p;                 // примитивные переменные  
+            //double g;                       // показатель адиабаты  
+            //double p_ratio, fg, q;          // вспомогательные переменные  
+
+            //r = v_ncons[(int)Vector_index.R];
+            //v = v_ncons[(int)Vector_index.V];
+            //p = v_ncons[(int)Vector_index.P];
+            //g = param.g;
+
+            //p_ratio = curr_press / p;
+            //if (curr_press <= p)
+            //{
+            //     волна разрежения  
+            //    fg = 2.0 / (g - 1.0);
+            //    F = fg * c * (Math.Pow(p_ratio, 1.0 / fg / g) - 1.0);
+            //    DF = 1.0 / r / c * Math.Pow(p_ratio, -0.5 * (g + 1.0) / g);
+            //}
+            //else
+            //{
+            //     ударная волна  
+            //    q = Math.Sqrt(0.5 * (g + 1.0) / g * p_ratio + 0.5 * (g - 1.0) / g);
+            //    F = (curr_press - p) / c / r / q;
+            //    DF = 0.25 * ((g + 1.0) * p_ratio + 3 * g - 1.0) / g / r / c / Math.Pow(q, 3.0);
+            //}
+
             return res(left_params, right_params, GAMMA);
-        }
-
-        static double[,] FindOwnValues(double[] cons_params, double GAMMA)
-        {
-            var omega = calc_omega(cons_params, GAMMA);
-            var omega_inverse = calc_omega_inverse(cons_params, GAMMA);
-            var lambda = calc_lambda(cons_params, GAMMA);
-
-            var m_tmp = MultuplyMatrixes(omega, lambda);
-            return MultuplyMatrixes(m_tmp, omega_inverse);
         }
 
         static double[] res(double[] left_params, double[] right_params, double GAMMA)

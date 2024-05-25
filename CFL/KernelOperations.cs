@@ -233,5 +233,16 @@ namespace Sod.CFL
             lambda[2, 2] = Math.Abs(v_ncons[1] + c);
             return lambda;
         }
+
+        protected static double[,] FindOwnValues(double[] cons_params, double GAMMA)
+        {
+            var omega = calc_omega(cons_params, GAMMA);
+            var omega_inverse = calc_omega_inverse(cons_params, GAMMA);
+            var lambda = calc_lambda(cons_params, GAMMA);
+
+            var m_tmp = MultuplyMatrixes(omega, lambda);
+            return MultuplyMatrixes(m_tmp, omega_inverse);
+        }
+
     }
 }

@@ -45,7 +45,7 @@ namespace Sod.Utility
             };
             var ls1 = new LineSeries()
             {
-                Title = "KIR density",
+                Title = "CIR density",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,
@@ -69,7 +69,7 @@ namespace Sod.Utility
             //поменял местами для красоты
             var ls2 = new LineSeries()
             {
-                Title = "KIR speed",
+                Title = "CIR speed",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,
@@ -92,7 +92,7 @@ namespace Sod.Utility
 
             var ls3 = new LineSeries()
             {
-                Title = "KIR pressure",
+                Title = "CIR pressure",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,

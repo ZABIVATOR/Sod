@@ -15,17 +15,17 @@ using Sod.Utility;
 
 namespace Sod.CFL
 {
-    public class KIR : Plots, CFLmethod
+    public class CIR : Plots, CFLmethod
     {
         Parameters param;
-        public KIR(Parameters par) {
+        public CIR(Parameters par) {
             param = par;
         }
 
         public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3)
         {
             int boundary = 1;
-            result_name_file += "KIR_";
+            result_name_file += "CIR_";
 
             double GAMMA = param.g;
             double T_END = param.stop_time;

@@ -16,7 +16,7 @@ namespace Sod
             int N = 800;
             string result_name_file = $"Sod ";
             double gamma = 1.4;
-            double time = 0.01;
+            double time = 0.4;
 
             double ro_left = 1;
             double u_left = 0;
@@ -28,8 +28,8 @@ namespace Sod
 
             var param = new Parameters(N, time, [ro_left, u_left, p_left], [ro_right, u_right, p_right], gamma);
 
-            var kir = new KIR(param);
-            var k = kir.CalculateWrite(result_name_file,false);
+            var CIR = new CIR(param);
+            var k = CIR.CalculateWrite(result_name_file,false);
 
             var gg = new Godunov(param);
             var g = gg.CalculateWrite(result_name_file,false);

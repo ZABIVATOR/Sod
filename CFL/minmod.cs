@@ -29,7 +29,7 @@ namespace Sod.CFL
         }
 
 
-        public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3, double CFL = 0.2, bool modified= false)
+        public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3, double CFL = 0.2, bool predictor = false)
         {
             int boundary = 1;
             result_name_file += "minmod_";
@@ -161,7 +161,6 @@ namespace Sod.CFL
                     }
                 }
 
-
                 //corrector
                 double[,] Qm = new double[N,M];
                 //calc minmod
@@ -172,10 +171,16 @@ namespace Sod.CFL
                     double[] temp3 = new double[M];
                     for (int j = 0; j < M; j++)
                     {
-                        temp1[j] = u_predicted[i - 1, j];
-                        temp2[j] = u_predicted[i, j];
-                        temp3[j] = u_predicted[i + 1, j];
-                        
+                        if (predictor)
+                        {
+                            temp1[j] = u_predicted[i - 1, j];
+                            temp2[j] = u_predicted[i, j];
+                            temp3[j] = u_predicted[i + 1, j];
+                        }
+                        temp1[j] = u_prev[i - 1, j];
+                        temp2[j] = u_prev[i, j];
+                        temp3[j] = u_prev[i + 1, j];
+
                         Qm[i,j] = minmod((temp3[j] - temp2[j]) / h, (temp2[j] - temp1[j]) / h);
                     }
                 }
@@ -227,9 +232,16 @@ namespace Sod.CFL
                         double[] mm3 = new double[M];
                         for (int j = 0; j < M; j++)
                         {
-                            temp1[j] = u_predicted[i - 1, j];
-                            temp2[j] = u_predicted[i, j];
-                            temp3[j] = u_predicted[i + 1, j];
+                            if (predictor)
+                            {
+                                temp1[j] = u_predicted[i - 1, j];
+                                temp2[j] = u_predicted[i, j];
+                                temp3[j] = u_predicted[i + 1, j];
+                            }
+                            temp1[j] = u_prev[i - 1, j];
+                            temp2[j] = u_prev[i, j];
+                            temp3[j] = u_prev[i + 1, j];
+
                             mm1[j] = Qm[i-1, j];
                             mm2[j] = Qm[i , j];
                             mm3[j] = Qm[i +1, j];
@@ -275,7 +287,9 @@ namespace Sod.CFL
             double[] res = new double[u.Length];
             for (int i = 0;i<u.Length;i++)
             {
-                res[i] = u[i]+ sign*0.5 * h * q[i];
+                if (u[i] != 0)
+                    res[i] = u[i]+ sign * 0.5 * h * q[i];
+                res[i] = u[i];
             }
             return res;
         }

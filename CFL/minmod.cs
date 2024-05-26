@@ -235,15 +235,15 @@ namespace Sod.CFL
                             mm3[j] = Qm[i +1, j];
                         }
 
-                        flux_left = CalculateFlux(AddQm(temp1, mm1, h, 1), AddQm(temp2, mm2, h, -1), GAMMA);
                         flux_right = CalculateFlux(AddQm(temp2, mm2, h, 1), AddQm(temp3, mm3, h, -1), GAMMA);
+                        flux_left = CalculateFlux(AddQm(temp1, mm1, h, 1), AddQm(temp2, mm2, h, -1), GAMMA);
                     }
 
 
 
                     for (int j = 0; j < M; j++)
                     {
-                        u_next[i, j] = 0.2* u_next[i, j]+ 0.8*(u_prev[i, j] - dt * (flux_right[j] - flux_left[j]) / h);
+                        u_next[i, j] = u_prev[i, j] - dt * (flux_right[j] - flux_left[j]) / h;
                     }
                 }
 

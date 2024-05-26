@@ -22,7 +22,7 @@ namespace Sod
             double[,] left = { { 1, 0, 1 }, { 1.0, 0.75, 1.0 }, { 1.0, -2.0, 0.4 }, { 1.0, 0.0, 1000.0 }, { 5.99924, 19.5975, 460.894 } };
             double[,] right = { { 0.125, 0.0, 0.1 }, { 0.125, 0.0, 0.1 }, { 1.0, 2.0, 0.4 }, { 1.0, 0.0, 0.01 }, { 5.99242, -6.19633, 46.0950 } };
 
-            for (int i = 0; i <= 0; i++)
+            for (int i = 2; i <= 3; i++)
             {
                 double ro_left = left[i,0];
                 double u_left = left[i,1];
@@ -41,7 +41,7 @@ namespace Sod
                 var g = gg.CalculateWrite(result_name_file + "Test " + i.ToString() + " ",false, 3, 0.2);
 
                 var mm = new Minmod(param);
-                var m = mm.CalculateWrite(result_name_file + "Test " + i.ToString() + " ", false, 3, 0.2,true);
+                var m = mm.CalculateWrite(result_name_file + "Test " + i.ToString() + " ", true, 3, 0.2);
 
                 Plots.PlotBoth(param, g, m, "Test " + i.ToString() + " ","Godunov","MUSCL");
             }

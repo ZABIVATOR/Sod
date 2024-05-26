@@ -17,8 +17,14 @@ namespace Sod.CFL
         }
         double minmod(double a, double b)
         {
-            if (a is double.NaN) return 0; 
-            if (b is double.NaN)  return 0;
+            if (a is double.NaN)
+            {
+                return 0;
+            }
+            if (b is double.NaN)
+            {
+                return 0;
+            }
             return 0.5 * (Math.Sign(a) + Math.Sign(b)) * Math.Min(Math.Abs(a), Math.Abs(b));
         }
 
@@ -150,7 +156,7 @@ namespace Sod.CFL
 
                     for (int j = 0; j < M; j++)
                     {
-                        u_next[i, j] = u_prev[i, j] - dt * (flux_right[j] - flux_left[j]) / (x[i + 1] - x[i]);
+                        u_next[i, j] = u_prev[i, j] - dt * (flux_right[j] - flux_left[j]) / h;
                         u_predicted[i, j] = 0.5 * (u_next[i, j] + u_prev[i, j]);
                     }
                 }
@@ -170,7 +176,7 @@ namespace Sod.CFL
                         temp2[j] = u_predicted[i, j];
                         temp3[j] = u_predicted[i + 1, j];
                         
-                        Qm[i,j] = minmod((temp3[j] - temp2[j]) / (x[i + 1] - x[i]), (temp2[j] - temp1[j]) / (x[i + 1] - x[i]));
+                        Qm[i,j] = minmod((temp3[j] - temp2[j]) / h, (temp2[j] - temp1[j]) / h);
                     }
                 }
                 Qm[0, 0] = 0;
@@ -229,19 +235,15 @@ namespace Sod.CFL
                             mm3[j] = Qm[i +1, j];
                         }
 
-                        flux_right = CalculateFlux(AddQm(temp2, mm2, (x[i + 1] - x[i]), 1), AddQm(temp3, mm3, (x[i + 1] - x[i]), -1), GAMMA);
-                        flux_left = CalculateFlux(AddQm(temp1, mm1, (x[i + 1] - x[i]), 1), AddQm(temp2, mm2, (x[i + 1] - x[i]), -1), GAMMA);
+                        flux_left = CalculateFlux(AddQm(temp1, mm1, h, 1), AddQm(temp2, mm2, h, -1), GAMMA);
+                        flux_right = CalculateFlux(AddQm(temp2, mm2, h, 1), AddQm(temp3, mm3, h, -1), GAMMA);
                     }
 
 
 
                     for (int j = 0; j < M; j++)
                     {
-                        //CHasovskoy Scheme
-                        if (modified)
-                            u_next[i, j] = (0.5 * u_next[i, j] + 0.5 * (u_prev[i, j] - dt * (flux_right[j] - flux_left[j]) / (x[i + 1] - x[i])));
-                        else
-                            u_next[i, j] = u_prev[i, j] - dt * (flux_right[j] - flux_left[j]) / (x[i + 1] - x[i]);
+                        u_next[i, j] = 0.2* u_next[i, j]+ 0.8*(u_prev[i, j] - dt * (flux_right[j] - flux_left[j]) / h);
                     }
                 }
 
@@ -270,11 +272,12 @@ namespace Sod.CFL
 
         double[] AddQm(double[] u, double[] q,double h,double sign = 1)
         {
+            double[] res = new double[u.Length];
             for (int i = 0;i<u.Length;i++)
             {
-                u[i] += sign*0.5 * h * q[i];
+                res[i] = u[i]+ sign*0.5 * h * q[i];
             }
-            return u;
+            return res;
         }
 
         static double[] CalculateFlux(double[] left_params, double[] right_params, double GAMMA)

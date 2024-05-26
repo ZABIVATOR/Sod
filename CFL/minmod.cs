@@ -237,7 +237,9 @@ namespace Sod.CFL
 
                     for (int j = 0; j < M; j++)
                     {
-                        u_next[i, j] = (0.8 * u_next[i, j] + 0.2 * (u_prev[i, j] - dt * (flux_right[j] - flux_left[j]) / (x[i + 1] - x[i])));
+                        //CHasovskoy Scheme
+                        //u_next[i, j] = (0.8 * u_next[i, j] + 0.2 * (u_prev[i, j] - dt * (flux_right[j] - flux_left[j]) / (x[i + 1] - x[i])));
+                        u_next[i, j] = u_prev[i, j] - dt * (flux_right[j] - flux_left[j]) / (x[i + 1] - x[i]);
                     }
                 }
 

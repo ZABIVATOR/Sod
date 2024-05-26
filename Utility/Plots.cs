@@ -14,7 +14,7 @@ namespace Sod.Utility
 {
     public abstract class Plots : Write
     {
-        public static void PlotBoth(Parameters param, double[,] v_cons1, double[,] v_cons2, string method)
+        public static void PlotBoth(Parameters param, double[,] v_cons1, double[,] v_cons2, string method,string method1, string method2)
         {
             method = method + "both_";
             var time = param.stop_time;
@@ -45,7 +45,7 @@ namespace Sod.Utility
             };
             var ls1 = new LineSeries()
             {
-                Title = "CIR density",
+                Title = method1+" density",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,
@@ -55,7 +55,7 @@ namespace Sod.Utility
             };
             var ls1_ = new LineSeries()
             {
-                Title = "Godunov density",
+                Title = method2+" density",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,
@@ -69,7 +69,7 @@ namespace Sod.Utility
             //поменял местами для красоты
             var ls2 = new LineSeries()
             {
-                Title = "CIR speed",
+                Title = method1 +" speed",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,
@@ -79,7 +79,7 @@ namespace Sod.Utility
             };
             var ls2_ = new LineSeries()
             {
-                Title = "Godunov speed",
+                Title = method2+ " speed",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,
@@ -92,7 +92,7 @@ namespace Sod.Utility
 
             var ls3 = new LineSeries()
             {
-                Title = "CIR pressure",
+                Title = method1 + " pressure",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,
@@ -102,7 +102,7 @@ namespace Sod.Utility
             };
             var ls3_ = new LineSeries()
             {
-                Title = "Godunov speed",
+                Title = method2 +" speed",
                 MarkerStrokeThickness = 0,
                 MarkerStroke = OxyColors.Transparent,
                 LineStyle = LineStyle.None,

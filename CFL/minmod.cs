@@ -23,7 +23,7 @@ namespace Sod.CFL
         }
 
 
-        public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3, double CFL = 0.2)
+        public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3, double CFL = 0.2, bool modified= false)
         {
             int boundary = 1;
             result_name_file += "minmod_";
@@ -238,8 +238,10 @@ namespace Sod.CFL
                     for (int j = 0; j < M; j++)
                     {
                         //CHasovskoy Scheme
-                        //u_next[i, j] = (0.8 * u_next[i, j] + 0.2 * (u_prev[i, j] - dt * (flux_right[j] - flux_left[j]) / (x[i + 1] - x[i])));
-                        u_next[i, j] = u_prev[i, j] - dt * (flux_right[j] - flux_left[j]) / (x[i + 1] - x[i]);
+                        if (modified)
+                            u_next[i, j] = (0.5 * u_next[i, j] + 0.5 * (u_prev[i, j] - dt * (flux_right[j] - flux_left[j]) / (x[i + 1] - x[i])));
+                        else
+                            u_next[i, j] = u_prev[i, j] - dt * (flux_right[j] - flux_left[j]) / (x[i + 1] - x[i]);
                     }
                 }
 

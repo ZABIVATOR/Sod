@@ -16,7 +16,7 @@ namespace Sod
             int N = 200;
             string result_name_file = $"";
             double gamma = 1.4;
-            double time = 0.05;
+            double time = 0.02;
 
             // Sod, Modified Sod, 2 vacuum waves, Big gradient, 3 breaks
             double[,] left = { { 1, 0, 1 }, { 1.0, 0.75, 1.0 }, { 1.0, -2.0, 0.4 }, { 1.0, 0.0, 1000.0 }, { 5.99924, 19.5975, 460.894 } };
@@ -41,7 +41,7 @@ namespace Sod
                 var g = gg.CalculateWrite(result_name_file + "Test " + i.ToString() + " ",false, 3, 0.2,  path);
 
                 var mm = new Minmod(param);
-                var m = mm.CalculateWrite(result_name_file + "Test " + i.ToString() + " ", false, 3, 0.2, true, path);
+                var m = mm.CalculateWrite(result_name_file + "Test " + i.ToString() + " ", false, 3, 0.1, false, path);
 
                 Plots.PlotBoth(param, g, m, "Test " + i.ToString() + " ","Godunov","MUSCL", path);
             }

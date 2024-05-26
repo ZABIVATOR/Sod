@@ -137,6 +137,30 @@ namespace Sod.CFL
 
         }
 
+        protected static double[] res(double[] left_params, double[] right_params, double GAMMA)
+        {
+            int M = (int)Vector_index.M;
+            int i, j;
+            double[] flux = new double[M];
+            double[,] m_left = new double[M, M];
+            double[,] m_right = new double[M, M];
+
+            var left_diff_flux = ConservativeDifference(left_params, GAMMA);
+            var right_diff_flux = ConservativeDifference(right_params, GAMMA);
+
+            m_left = FindOwnValues(left_params, GAMMA);
+            m_right = FindOwnValues(right_params, GAMMA);
+
+            for (i = 0; i < M; i++)
+            {
+                flux[i] = 0.5 * (left_diff_flux[i] + right_diff_flux[i]);
+                for (j = 0; j < M; j++)
+                    flux[i] += 0.5 * (0.5 * (m_left[i, j] + m_right[i, j])) * (left_params[j] - right_params[j]);
+            }
+
+            return flux;
+        }
+
         protected static double CalculateSoundVelocity(double[] v_ncons, double GAMMA)
         {
             return Math.Sqrt(GAMMA * v_ncons[(int)Vector_index.P] / v_ncons[(int)Vector_index.R]);

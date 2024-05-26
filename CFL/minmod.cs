@@ -1,27 +1,32 @@
-﻿using System;
+﻿using Sod.Utility;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Sod.Utility;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
-
 
 namespace Sod.CFL
 {
-    public class Godunov : Plots
+    internal class Minmod : Plots
     {
 
         Parameters param;
-        public Godunov(Parameters par)
+        public Minmod(Parameters par)
         {
             param = par;
         }
+        double minmod(double a, double b)
+        {
+            if (a is double.NaN) return 0; 
+            if (b is double.NaN)  return 0;
+            return 0.5 * (Math.Sign(a) + Math.Sign(b)) * Math.Min(Math.Abs(a), Math.Abs(b));
+        }
+
 
         public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3, double CFL = 0.2)
         {
             int boundary = 1;
-            result_name_file += "Godunov_";
+            result_name_file += "minmod_";
 
             double GAMMA = param.g;
             double T_END = param.stop_time;
@@ -61,7 +66,12 @@ namespace Sod.CFL
 
 
             double[] v = new double[M];
+            double[,] u_1 = new double[N, M];
+            double[,] u_2 = new double[N, M];
+            double[,] u_predicted =  new double[N, M];
 
+
+            
             for (int i = 0; i < N; i++)
             {
                 if (i < Math.Round(N * 0.5))
@@ -86,8 +96,11 @@ namespace Sod.CFL
                 PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file);
             while (T_END - curr_t > 0)
             {
+                
+                dt = CFL * CalculateTimeStep(x, u_prev, N, GAMMA);
+                //predictor
 
-                dt = CFL*CalculateTimeStep(x, u_prev, N, GAMMA);
+
                 for (int i = 0; i < N; i++)
                 {
                     if (i != 0)
@@ -136,7 +149,96 @@ namespace Sod.CFL
                     }
 
                     for (int j = 0; j < M; j++)
+                    {
                         u_next[i, j] = u_prev[i, j] - dt * (flux_right[j] - flux_left[j]) / (x[i + 1] - x[i]);
+                        u_predicted[i, j] = 0.5 * (u_next[i, j] + u_prev[i, j]);
+                    }
+                }
+
+
+                //corrector
+                double[,] Qm = new double[N,M];
+                //calc minmod
+                for (int i = 1; i < N-1; i++)
+                {
+                    double[] temp1 = new double[M];
+                    double[] temp2 = new double[M];
+                    double[] temp3 = new double[M];
+                    for (int j = 0; j < M; j++)
+                    {
+                        temp1[j] = u_predicted[i - 1, j];
+                        temp2[j] = u_predicted[i, j];
+                        temp3[j] = u_predicted[i + 1, j];
+                        
+                        Qm[i,j] = minmod((temp3[j] - temp2[j]) / (x[i + 1] - x[i]), (temp2[j] - temp1[j]) / (x[i + 1] - x[i]));
+                    }
+                }
+                Qm[0, 0] = 0;
+                Qm[0, 1] = 0;
+                Qm[0, 2] = 0;
+                Qm[N-1, 0] = 0;
+                Qm[N - 1, 1] = 0;
+                Qm[N - 1, 2] = 0;
+
+
+                //flux calc
+                for (int i = 0; i < N; i++)
+                {
+                    if (i == 0)
+                    {
+                        double[] temp = new double[M];
+                        double[] temp3 = new double[M];
+                        for (int j = 0; j < M; j++)
+                        {
+                            temp[j] = u_prev[0, j];
+                            temp3[j] = u_prev[1, j];
+                        }
+                        boun_v = BoundaryCondition(temp, boundary);
+                        flux_left = CalculateFlux(boun_v, temp, GAMMA);
+                        flux_right = CalculateFlux(temp, temp3, GAMMA);
+                    }
+                    else
+                    if (i == N - 1)
+                    {
+                        double[] temp = new double[M];
+                        double[] temp2 = new double[M];
+                        for (int j = 0; j < M; j++)
+                        {
+                            temp[j] = u_prev[N - 1, j];
+                            temp2[j] = u_prev[N - 2, j];
+                        }
+                        boun_v = BoundaryCondition(temp, boundary);
+                        flux_right = CalculateFlux(temp, boun_v, GAMMA);
+                        flux_left = CalculateFlux(temp2, temp, GAMMA);
+                    }
+                    else
+                    {
+                        double[] temp1 = new double[M];
+                        double[] temp2 = new double[M];
+                        double[] temp3 = new double[M];
+                        double[] mm1 = new double[M];
+                        double[] mm2 = new double[M];
+                        double[] mm3 = new double[M];
+                        for (int j = 0; j < M; j++)
+                        {
+                            temp1[j] = u_predicted[i - 1, j];
+                            temp2[j] = u_predicted[i, j];
+                            temp3[j] = u_predicted[i + 1, j];
+                            mm1[j] = Qm[i-1, j];
+                            mm2[j] = Qm[i , j];
+                            mm3[j] = Qm[i +1, j];
+                        }
+
+                        flux_right = CalculateFlux(AddQm(temp2, mm2, (x[i + 1] - x[i]), 1), AddQm(temp3, mm3, (x[i + 1] - x[i]), -1), GAMMA);
+                        flux_left = CalculateFlux(AddQm(temp1, mm1, (x[i + 1] - x[i]), 1), AddQm(temp2, mm2, (x[i + 1] - x[i]), -1), GAMMA);
+                    }
+
+
+
+                    for (int j = 0; j < M; j++)
+                    {
+                        u_next[i, j] = (0.8 * u_next[i, j] + 0.2 * (u_prev[i, j] - dt * (flux_right[j] - flux_left[j]) / (x[i + 1] - x[i])));
+                    }
                 }
 
                 for (int i = 0; i < N; i++)
@@ -162,6 +264,15 @@ namespace Sod.CFL
             return u_prev;
         }
 
+        double[] AddQm(double[] u, double[] q,double h,double sign = 1)
+        {
+            for (int i = 0;i<u.Length;i++)
+            {
+                u[i] += sign*0.5 * h * q[i];
+            }
+            return u;
+        }
+
         static double[] CalculateFlux(double[] left_params, double[] right_params, double GAMMA)
         {
             //int i;
@@ -178,9 +289,9 @@ namespace Sod.CFL
             //    xc[i] = 0.5 * (x[i] + x[i + 1]);
             //}
 
-            var parameters = new Parameters((int)Vector_index.M,1e-6,left_params,right_params,GAMMA);
+            var parameters = new Parameters((int)Vector_index.M, 1e-6, left_params, right_params, GAMMA);
             var exact = ExactSolution.Calculate(parameters, GAMMA);
-            exact = ConvertConsToPrimitive(exact,GAMMA);
+            exact = ConvertConsToPrimitive(exact, GAMMA);
 
             //double r, v, p;                 // примитивные переменные  
             //double g;                       // показатель адиабаты  
@@ -212,3 +323,4 @@ namespace Sod.CFL
 
     }
 }
+

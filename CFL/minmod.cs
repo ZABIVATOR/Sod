@@ -29,7 +29,7 @@ namespace Sod.CFL
         }
 
 
-        public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3, double CFL = 0.2, bool predictor = false)
+        public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3, double CFL = 0.2, bool predictor = false, string path ="")
         {
             int boundary = 1;
             result_name_file += "minmod_";
@@ -99,7 +99,7 @@ namespace Sod.CFL
                 }
             }
             if (write)
-                PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file, "C:\\Users\\Alex\\source\\repos\\Sod\\1_results\\");
+                PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file, path);
             while (T_END - curr_t > 0)
             {
                 
@@ -177,10 +177,12 @@ namespace Sod.CFL
                             temp2[j] = u_predicted[i, j];
                             temp3[j] = u_predicted[i + 1, j];
                         }
-                        temp1[j] = u_prev[i - 1, j];
-                        temp2[j] = u_prev[i, j];
-                        temp3[j] = u_prev[i + 1, j];
-
+                        else
+                        {
+                            temp1[j] = u_prev[i - 1, j];
+                            temp2[j] = u_prev[i, j];
+                            temp3[j] = u_prev[i + 1, j];
+                        }
                         Qm[i,j] = minmod((temp3[j] - temp2[j]) / h, (temp2[j] - temp1[j]) / h);
                     }
                 }
@@ -238,10 +240,12 @@ namespace Sod.CFL
                                 temp2[j] = u_predicted[i, j];
                                 temp3[j] = u_predicted[i + 1, j];
                             }
-                            temp1[j] = u_prev[i - 1, j];
-                            temp2[j] = u_prev[i, j];
-                            temp3[j] = u_prev[i + 1, j];
-
+                            else
+                            {
+                                temp1[j] = u_prev[i - 1, j];
+                                temp2[j] = u_prev[i, j];
+                                temp3[j] = u_prev[i + 1, j];
+                            }
                             mm1[j] = Qm[i-1, j];
                             mm2[j] = Qm[i , j];
                             mm3[j] = Qm[i +1, j];
@@ -268,14 +272,14 @@ namespace Sod.CFL
                 if (write)
                     if (0.0001 < curr_t & curr_t < 0.1 & Math.Round(curr_t % 0.005, presision) == 0)
                     {
-                        PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file, "C:\\Users\\Alex\\source\\repos\\Sod\\1_results\\");
+                        PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file, path);
 
                     }
                     else
                     {
                         if (curr_t >= 0.1 & Math.Round(curr_t % 0.1, presision) == 0)
                         {
-                            PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file, "C:\\Users\\Alex\\source\\repos\\Sod\\1_results\\");
+                            PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file, path);
                         }
                     }
             }
@@ -287,7 +291,7 @@ namespace Sod.CFL
             double[] res = new double[u.Length];
             for (int i = 0;i<u.Length;i++)
             {
-                if (u[i] != 0)
+                if (q[i] != 0)
                     res[i] = u[i]+ sign * 0.5 * h * q[i];
                 res[i] = u[i];
             }

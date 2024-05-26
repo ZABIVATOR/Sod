@@ -18,7 +18,7 @@ namespace Sod.CFL
             param = par;
         }
 
-        public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3, double CFL = 0.2)
+        public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3, double CFL = 0.2, string path = ""  )
         {
             int boundary = 1;
             result_name_file += "Godunov_";
@@ -83,7 +83,7 @@ namespace Sod.CFL
                 }
             }
             if (write)
-                PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file, "C:\\Users\\Alex\\source\\repos\\Sod\\1_results\\");
+                PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file, path);
             while (T_END - curr_t > 0)
             {
 
@@ -148,14 +148,14 @@ namespace Sod.CFL
                 if (write)
                     if (0.0001 < curr_t & curr_t < 0.1 & Math.Round(curr_t % 0.005, presision) == 0)
                     {
-                        PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file, "C:\\Users\\Alex\\source\\repos\\Sod\\1_results\\");
+                        PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file, path);
 
                     }
                     else
                     {
                         if (curr_t >= 0.1 & Math.Round(curr_t % 0.1, presision) == 0)
                         {
-                            PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file, "C:\\Users\\Alex\\source\\repos\\Sod\\1_results\\");
+                            PlotSod(param, xc, u_prev, curr_t, N, GAMMA, result_name_file, path);
                         }
                     }
             }

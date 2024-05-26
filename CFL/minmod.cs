@@ -29,8 +29,9 @@ namespace Sod.CFL
         }
 
 
-        public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3, double CFL = 0.2, bool predictor = true, string path ="")
+        public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3, double CFL = 0.2, string path ="")
         {
+            bool predictor = true;
             int boundary = 1;
             result_name_file += "minmod_";
 

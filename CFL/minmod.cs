@@ -29,7 +29,7 @@ namespace Sod.CFL
         }
 
 
-        public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3, double CFL = 0.2, bool modified= false, string path="")
+        public double[,] CalculateWrite(string result_name_file, bool write = true, int presision = 3, double CFL = 0.2, bool prediction= true, string path="")
         {
             int boundary = 1;
             result_name_file += "minmod_";
@@ -272,10 +272,14 @@ namespace Sod.CFL
 
         double[] AddQm(double[] u, double[] q,double h,double sign = 1)
         {
+
             double[] res = new double[u.Length];
             for (int i = 0;i<u.Length;i++)
             {
-                res[i] = u[i]+ sign*0.5 * h * q[i];
+                if (q[i] != 0)
+                    res[i] = u[i]+ sign*0.5 * h * q[i];
+                else
+                    res[i] = u[i];
             }
             return res;
         }

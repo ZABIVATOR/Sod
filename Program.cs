@@ -13,7 +13,7 @@ namespace Sod
         static void Main()
         {
             string path = "C:\\Users\\priym\\source\\repos\\Sod\\1_results\\";
-            int N = 400;
+            int N = 200;
             string result_name_file = $"";
             double gamma = 1.4;
             double time = 0.1;
